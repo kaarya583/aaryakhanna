@@ -95,9 +95,20 @@ function renderProgramming(prog) {
 }
 
 function renderProjectDetails(p) {
-  const bullets = p.bullets;
-  if (Array.isArray(bullets) && bullets.length) {
-    const items = bullets.map((b) => `<li>${esc(b)}</li>`).join("");
+  // Support bullets, highlights (same shape as experience), or a single string.
+  // Prefer non-empty array if both keys exist.
+  let raw = null;
+  if (Array.isArray(p.bullets) && p.bullets.length) raw = p.bullets;
+  else if (Array.isArray(p.highlights) && p.highlights.length) raw = p.highlights;
+
+  let lines = [];
+  if (Array.isArray(raw) && raw.length) {
+    lines = raw;
+  } else if (typeof raw === "string" && raw.trim()) {
+    lines = [raw];
+  }
+  if (lines.length) {
+    const items = lines.map((b) => `<li>${esc(b)}</li>`).join("");
     return `<ul class="project-bullets">${items}</ul>`;
   }
   if (p.description && String(p.description).trim()) {

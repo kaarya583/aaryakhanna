@@ -547,35 +547,27 @@ section:not(:last-of-type) {
 }
 
 .project-bullets {
-  flex: 1;
+  flex: 0 1 auto;
   margin: 0;
-  padding: 0 0 0 1.1rem;
-  list-style: none;
+  padding: 0 0 0 1.35rem;
+  list-style: disc;
+  list-style-position: outside;
 }
 
 .project-bullets li {
-  position: relative;
   font-size: 0.92rem;
   line-height: 1.55;
   color: var(--text-muted);
-  margin-bottom: 0.55rem;
-  padding-left: 0.55rem;
+  margin-bottom: 0.5rem;
+  padding-left: 0.35rem;
+}
+
+.project-bullets li::marker {
+  color: var(--accent);
 }
 
 .project-bullets li:last-child {
   margin-bottom: 0;
-}
-
-.project-bullets li::before {
-  content: "";
-  position: absolute;
-  left: -0.65rem;
-  top: 0.55em;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  box-shadow: 0 0 0 2px var(--accent-glow);
 }
 
 .tech {

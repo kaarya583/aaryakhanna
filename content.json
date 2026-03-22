@@ -1,11 +1,11 @@
 {
   "name": "Aarya Khanna",
-  "heroEyebrow": "Data science · UCLA",
+  "heroEyebrow": "Data Scientist · Machine Learning Scientist",
   "tagline": "Statistics | Machine Learning",
-  "heroSubtitle": "Statistics & Data Science @ UCLA · Data Scientist · Machine Learning Scientist",
+  "heroSubtitle": "Statistics & Data Science @ UCLA",
   "heroLocation": "St. Louis → Los Angeles",
   "about": [
-    "I'm a data scientist passionate about using data and machine learning techniques to make an impact in helping solve critical problems."
+    "I'm a data scientist passionate about using data and machine learning techniques to make an impact in helping solve critical problems. My research interests include high-dimensional statistics, clustering, and manifold learning."
   ],
   "experience": [
     {
@@ -28,17 +28,7 @@
         "Automated cluster quality evaluation by comparing each vector’s distance to its cluster centroid—reverse-engineering a “cluster theme”—then used it as a baseline for an LLM to grade compactness with contextual reasoning."
       ],
       "software": "Python (PyTorch, Pandas, NumPy, scikit-learn, matplotlib, NLTK, Hugging Face, SBERT), Linux",
-      "methods": "K-means / HDBSCAN / DBSCAN clustering, logistic/linear regression, LLMs, text embeddings, dimension reduction (UMAP/PCA), silhouette scores"
-    },
-    {
-      "role": "ML President",
-      "organization": "Bruin Machine Learning & Analytics",
-      "highlights": [
-        "Lead the ML aspect of projects spanning stock portfolio optimization, F1 race predictions, and audio wavelength decomposition.",
-        "Teach a weekly ML curriculum to 30+ members—foundational topics in depth plus high-level views of recent advances and current research."
-      ],
-      "software": "",
-      "methods": ""
+      "methods": "K-means / HDBSCAN / DBSCAN clustering, logistic/linear regression, LLMs, API text embeddings, dimension reduction (UMAP/PCA), silhouette scores"
     }
   ],
   "programming": {
@@ -48,26 +38,48 @@
   "projects": [
     {
       "title": "Transit Deserts: Who the Los Angeles Metro System Leaves Behind",
-      "description": "Interface that geostatistically analyzes the LA public transportation system’s routes and connectivity. Surfaces which geographical, socioeconomic, natural, and other demographic factors are underrepresented.",
+      "bullets": [
+        "Geostatistical interface analyzing LA Metro routes and system connectivity.",
+        "Surfaces geographical, socioeconomic, and other demographic factors that are underrepresented in access.",
+        "Quantifies the impact of the Olympic Project 28 Metro D-Line extension on transit accessibility and equity."
+      ],
       "tech": ["Geospatial", "Statistics", "Python"],
       "links": { "repo": "", "demo": "" }
     },
     {
       "title": "TwistEd",
-      "description": "Real-time weather alerts, safest recommended travel routes, and an interactive chatbot for historical questions—plus an educational section on severe weather types and precautions.",
+      "bullets": [
+        "Real-time weather alerts and safest recommended travel routes.",
+        "Interactive chatbot for historical weather questions.",
+        "Educational section on severe weather types and precautions."
+      ],
       "tech": ["ML", "NLP", "Weather APIs"],
       "links": { "repo": "", "demo": "" }
     },
     {
       "title": "CoursePlanner AI Chatbot",
-      "description": "Uses UCLA’s Developer API with LangChain and Pinecone to help students build optimized course plans from natural language. Contextualizes top matches when justifying recommendations.",
+      "bullets": [
+        "Uses UCLA’s Developer API with LangChain and Pinecone to build optimized course plans from natural language.",
+        "Contextualizes top matches when justifying specific course recommendations."
+      ],
       "tech": ["LangChain", "Pinecone", "LLMs"],
       "links": { "repo": "", "demo": "" }
     },
     {
       "title": "Analogy LLM",
-      "description": "Building an LLM that explains mathematical concepts in the context of another field through strong analogies.",
+      "bullets": [
+        "Building an LLM that explains mathematical concepts in the context of another field through strong analogies."
+      ],
       "tech": ["LLMs", "Education", "Research"],
+      "links": { "repo": "", "demo": "" }
+    },
+    {
+      "title": "Vertical Los Angeles",
+      "bullets": [
+        "Models the vertical distribution of skyline clusters in Los Angeles using geospatial data and machine learning.",
+        "Predicts potential locations for new high-rise clusters using density-based clustering and socioeconomic factors."
+      ],
+      "tech": ["Geospatial", "Python", "Research"],
       "links": { "repo": "", "demo": "" }
     }
   ],

@@ -94,6 +94,18 @@ function renderProgramming(prog) {
   `;
 }
 
+function renderProjectDetails(p) {
+  const bullets = p.bullets;
+  if (Array.isArray(bullets) && bullets.length) {
+    const items = bullets.map((b) => `<li>${esc(b)}</li>`).join("");
+    return `<ul class="project-bullets">${items}</ul>`;
+  }
+  if (p.description && String(p.description).trim()) {
+    return `<p class="desc">${esc(p.description)}</p>`;
+  }
+  return "";
+}
+
 function renderProjects(projects) {
   if (!projects || !projects.length) {
     return "<p class=\"muted\">Add projects in <code>content.json</code>.</p>";
@@ -111,11 +123,12 @@ function renderProjects(projects) {
           ? `<a href="${esc(p.links.demo)}" target="_blank" rel="noopener noreferrer">Live demo</a>`
           : "";
       const links = [demo, repo].filter(Boolean).join("");
+      const body = renderProjectDetails(p);
       return `
         <article class="project-card">
           <div class="project-card-inner">
             <h3>${esc(p.title || "Untitled")}</h3>
-            <p class="desc">${esc(p.description || "")}</p>
+            ${body}
             ${tech ? `<div class="tech">${tech}</div>` : ""}
             ${links ? `<div class="project-links">${links}</div>` : ""}
           </div>

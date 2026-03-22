@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="In-depth project write-ups — frameworks, methods, and visualizations."
+    />
+    <title>Projects — Aarya Khanna</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Outfit:wght@300;400;500;600;700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body class="page-projects">
+    <p id="load-error" class="load-error wrap" hidden>
+      Could not load <code>content.json</code>. Open this site over HTTP (e.g. GitHub Pages) or run a local server in the project folder.
+    </p>
+
+    <div class="bg-noise" aria-hidden="true"></div>
+    <div class="bg-grid" aria-hidden="true"></div>
+
+    <header class="site-header">
+      <div class="wrap">
+        <a href="./index.html" class="logo" id="site-name">Aarya Khanna</a>
+        <nav class="nav" aria-label="Primary">
+          <a href="./index.html#about">About</a>
+          <a href="./index.html#experience">Experience</a>
+          <a href="./index.html#programming">Stack</a>
+          <a href="./index.html#projects">Overview</a>
+          <a href="./projects.html" aria-current="page">Deep dives</a>
+          <a href="./index.html#contact">Contact</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="project-page-main">
+      <header class="project-page-hero wrap">
+        <p class="project-page-kicker">Portfolio</p>
+        <h1 class="project-page-title">Project deep dives</h1>
+        <p class="project-page-lead">
+          Extended write-ups on methods, frameworks, and figures. Add images under
+          <code>images/</code> and reference them in <code>content.json</code> →
+          <code>detail.visuals</code>.
+        </p>
+        <p class="project-page-back">
+          <a href="./index.html#projects">← Back to overview</a>
+        </p>
+      </header>
+
+      <div class="wrap" id="projects-toc"></div>
+
+      <div class="wrap project-deep-wrap" id="projects-detail-root"></div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <p>
+          © <span id="year"></span>
+          <span id="footer-name">Aarya Khanna</span>
+          <span class="footer-dot">·</span>
+          <a href="./index.html">Home</a>
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
+    <script src="./projects.js" defer></script>
+  </body>
+</html>

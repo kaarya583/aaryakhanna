@@ -117,6 +117,13 @@ function renderProjectDetails(p) {
   return "";
 }
 
+function slugify(title) {
+  return String(title || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
 function renderProjects(projects) {
   if (!projects || !projects.length) {
     return "<p class=\"muted\">Add projects in <code>content.json</code>.</p>";
@@ -136,14 +143,21 @@ function renderProjects(projects) {
       const links = [demo, repo].filter(Boolean).join("");
       const body = renderProjectDetails(p);
       const num = String(i + 1).padStart(2, "0");
+      const slug = p.slug || slugify(p.title);
+      const deepHref = `./projects.html#${encodeURIComponent(slug)}`;
       return `
         <li class="project-list-item">
           <span class="project-list-num" aria-hidden="true">${num}</span>
           <div class="project-list-body">
-            <h3 class="project-list-title">${esc(p.title || "Untitled")}</h3>
+            <h3 class="project-list-title">
+              <a class="project-list-title-link" href="${esc(deepHref)}">${esc(p.title || "Untitled")}</a>
+            </h3>
             ${body}
             ${tech ? `<div class="tech project-list-tech">${tech}</div>` : ""}
-            ${links ? `<div class="project-links">${links}</div>` : ""}
+            <div class="project-list-actions">
+              ${links ? `<div class="project-links">${links}</div>` : ""}
+              <a class="project-read-more" href="${esc(deepHref)}">Deep dive <span aria-hidden="true">→</span></a>
+            </div>
           </div>
         </li>
       `;

@@ -1,6 +1,5 @@
 {
   "name": "Aarya Khanna",
-  "heroEyebrow": "Data Scientist · Machine Learning Scientist",
   "tagline": "Statistics | Machine Learning",
   "heroSubtitle": "Statistics & Data Science @ UCLA",
   "heroLocation": "St. Louis → Los Angeles",
@@ -37,6 +36,7 @@
   },
   "projects": [
     {
+      "slug": "transit-deserts",
       "title": "Transit Deserts: Who the Los Angeles Metro System Leaves Behind",
       "bullets": [
         "Geostatistical interface analyzing LA Metro routes and system connectivity.",
@@ -44,9 +44,25 @@
         "Quantifies the impact of the Olympic Project 28 Metro D-Line extension on transit accessibility and equity."
       ],
       "tech": ["Geospatial", "Statistics", "Python"],
-      "links": { "repo": "", "demo": "" }
+      "links": { "repo": "", "demo": "" },
+      "detail": {
+        "intro": [
+          "This project builds an analytical interface to study how LA Metro’s network structure interacts with demographics and geography—where riders are underserved relative to need or population.",
+          "The deep dive focuses on defining transit deserts in a geostatistical sense (accessibility surfaces, connectivity gaps) and on counterfactual-style analysis around the Olympic Project 28 D-Line extension."
+        ],
+        "stack": "Modular pipeline: ingest GTFS-style route geometry and stops, build graph / accessibility layers, join census and open demographic layers, then export maps and summary tables for equity metrics.",
+        "methods": "Spatial joins, kernel-based accessibility proxies where appropriate, and comparative before/after panels for the D-Line extension scenario.",
+        "frameworks": ["Python", "GeoPandas / Shapely", "NetworkX or similar routing graphs", "matplotlib / folium for maps", "pandas"],
+        "visuals": [
+          {
+            "src": "",
+            "caption": "Map: transit accessibility surface vs. demographic stress (drop PNG/SVG into /images/ and set src)."
+          }
+        ]
+      }
     },
     {
+      "slug": "twisted",
       "title": "TwistEd",
       "bullets": [
         "Real-time weather alerts and safest recommended travel routes.",
@@ -54,33 +70,120 @@
         "Educational section on severe weather types and precautions."
       ],
       "tech": ["ML", "NLP", "Weather APIs"],
-      "links": { "repo": "", "demo": "" }
+      "links": { "repo": "", "demo": "" },
+      "detail": {
+        "intro": [
+          "TwistEd combines live hazard data with routing and an educational layer so users get alerts, safer paths, and context on what the risk actually means.",
+          "The assistant path uses retrieval over historical weather records so answers stay grounded in real events rather than generic text."
+        ],
+        "stack": "Client requests weather alerts and route preferences; backend aggregates API feeds, scores edges on risk, and serves a small RAG-style chat index over curated historical snippets.",
+        "methods": "Heuristic or learned route scoring under alerts; optional NLP intent routing for the chatbot; structured cards for the education module.",
+        "frameworks": ["Python or Node (your stack)", "Weather APIs", "Maps / directions API", "Vector store or BM25 for chat retrieval"],
+        "visuals": [
+          {
+            "src": "",
+            "caption": "UI mock or alert + route screenshot (add file under /images/)."
+          }
+        ]
+      }
     },
     {
+      "slug": "courseplanner-ai",
       "title": "CoursePlanner AI Chatbot",
       "bullets": [
         "Uses UCLA’s Developer API with LangChain and Pinecone to build optimized course plans from natural language.",
         "Contextualizes top matches when justifying specific course recommendations."
       ],
       "tech": ["LangChain", "Pinecone", "LLMs"],
-      "links": { "repo": "", "demo": "" }
+      "links": { "repo": "", "demo": "" },
+      "detail": {
+        "intro": [
+          "Students describe goals and constraints in natural language; the system queries UCLA course data, embeds descriptions, and retrieves tight candidate sets before the LLM explains tradeoffs.",
+          "Pinecone stores embedding-indexed course chunks so recommendations stay specific to UCLA offerings and update when the catalog changes."
+        ],
+        "stack": "LangChain orchestration (tools for catalog lookup), embedding model for course text, Pinecone for similarity, and a policy prompt that forces citations to retrieved rows.",
+        "methods": "Top-k retrieval with MMR or diversity, optional re-ranking, and structured JSON outputs for “plan” objects the UI can render.",
+        "frameworks": ["LangChain", "Pinecone", "OpenAI or open LLM API", "UCLA Developer API", "Python"],
+        "visuals": [
+          {
+            "src": "",
+            "caption": "Example chat turn with retrieved course cards (screenshot)."
+          }
+        ]
+      }
     },
     {
+      "slug": "analogy-llm",
       "title": "Analogy LLM",
       "bullets": [
         "Building an LLM that explains mathematical concepts in the context of another field through strong analogies."
       ],
       "tech": ["LLMs", "Education", "Research"],
-      "links": { "repo": "", "demo": "" }
+      "links": { "repo": "", "demo": "" },
+      "detail": {
+        "intro": [
+          "The goal is pedagogy: map abstract math to a domain the learner already trusts (biology, economics, music, etc.) while preserving definitions and not overstating isomorphism.",
+          "Training / prompting strategy centers on analogy quality rubrics—faithfulness, clarity, and appropriate scope—rather than fluency alone."
+        ],
+        "methods": "Instruction tuning or few-shot templates with critique steps; optional tool use for symbolic checks when available.",
+        "frameworks": ["PyTorch / HF Transformers", "PEFT / LoRA if fine-tuning", "Evaluation harness for analogy rubrics"],
+        "visuals": [
+          {
+            "src": "",
+            "caption": "Diagram: math concept → analogy → validation (placeholder)."
+          }
+        ]
+      }
     },
     {
+      "slug": "vertical-los-angeles",
       "title": "Vertical Los Angeles",
       "bullets": [
         "Models the vertical distribution of skyline clusters in Los Angeles using geospatial data and machine learning.",
         "Predicts potential locations for new high-rise clusters using density-based clustering and socioeconomic factors."
       ],
       "tech": ["Geospatial", "Python", "Research"],
-      "links": { "repo": "", "demo": "" }
+      "links": { "repo": "", "demo": "" },
+      "detail": {
+        "intro": [
+          "Skyline “mass” is modeled as clustered vertical intensity surfaces over the LA basin, combining building height proxies with land use and economic covariates.",
+          "Downstream use is exploratory forecasting: where might the next wave of clustering emerge under similar pressures?"
+        ],
+        "stack": "Raster or hex-grid features from building footprints / height datasets, merged with ACS-style demographics; clustering and optional gradient-boosted models for ranking candidate cells.",
+        "methods": "HDBSCAN / DBSCAN on engineered spatial features; calibration with held-out years or submarkets if data allows.",
+        "frameworks": ["Python", "GeoPandas", "scikit-learn", "XGBoost or similar", "matplotlib"],
+        "visuals": [
+          {
+            "src": "",
+            "caption": "3D or choropleth of vertical intensity by tract (add image when ready)."
+          }
+        ]
+      }
+    },
+    {
+      "slug": "clean-your-dishes",
+      "title": "Clean Your Dishes",
+      "bullets": [
+        "Detects and classifies dirty dishes in real-time using YOLO/DINO models through a camera placed in the kitchen.",
+        "Uses timestamps to track the sequence of dishes and their states, triggering an alert when a dish has been left dirty for over 30 minutes."
+      ],
+      "tech": ["Computer Vision", "Python", "YOLO/DINO"],
+      "links": { "repo": "", "demo": "" },
+      "detail": {
+        "intro": [
+          "A lightweight CV pipeline watches the sink area, classifies dish state (clean / dirty / ambiguous), and maintains a per-dish timeline from detections.",
+          "Alerts fire when dirty dwell time crosses a threshold—tunable for roommates or shared kitchens."
+        ],
+        "stack": "Camera stream → frame sampling → detector (YOLO or DINO-based detector) → tracker or heuristic ID stitching → timer service → notification channel.",
+        "methods": "Data augmentation for kitchen lighting; confidence thresholds to reduce false alarms; optional temporal smoothing across frames.",
+        "frameworks": ["PyTorch", "Ultralytics YOLO or HF Transformers", "OpenCV", "Python"],
+        "visuals": [
+          {
+            "src": "",
+            "caption": "Bounding boxes on sink scene + timer overlay (screenshot)."
+          }
+        ]
+      }
     }
   ],
   "contact": {

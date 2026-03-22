@@ -121,8 +121,8 @@ function renderProjects(projects) {
   if (!projects || !projects.length) {
     return "<p class=\"muted\">Add projects in <code>content.json</code>.</p>";
   }
-  return projects
-    .map((p) => {
+  const items = projects
+    .map((p, i) => {
       const tech = (p.tech || [])
         .map((t) => `<span>${esc(t)}</span>`)
         .join("");
@@ -135,18 +135,21 @@ function renderProjects(projects) {
           : "";
       const links = [demo, repo].filter(Boolean).join("");
       const body = renderProjectDetails(p);
+      const num = String(i + 1).padStart(2, "0");
       return `
-        <article class="project-card">
-          <div class="project-card-inner">
-            <h3>${esc(p.title || "Untitled")}</h3>
+        <li class="project-list-item">
+          <span class="project-list-num" aria-hidden="true">${num}</span>
+          <div class="project-list-body">
+            <h3 class="project-list-title">${esc(p.title || "Untitled")}</h3>
             ${body}
-            ${tech ? `<div class="tech">${tech}</div>` : ""}
+            ${tech ? `<div class="tech project-list-tech">${tech}</div>` : ""}
             ${links ? `<div class="project-links">${links}</div>` : ""}
           </div>
-        </article>
+        </li>
       `;
     })
     .join("");
+  return `<ol class="projects-list">${items}</ol>`;
 }
 
 function setVisible(el, show) {
@@ -159,9 +162,6 @@ function applyContent(data) {
   const name = data.name || "Portfolio";
   document.getElementById("site-name").textContent = name;
   document.getElementById("hero-name").textContent = name;
-
-  const eyebrow = document.getElementById("hero-eyebrow");
-  if (eyebrow && data.heroEyebrow) eyebrow.textContent = data.heroEyebrow;
 
   const tagEl = document.getElementById("tagline");
   tagEl.innerHTML = renderTagline(data.tagline) || esc(data.tagline || "");

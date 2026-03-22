@@ -1,0 +1,79 @@
+{
+  "name": "Aarya Khanna",
+  "heroEyebrow": "Data science · UCLA",
+  "tagline": "Statistics | Machine Learning",
+  "heroSubtitle": "Statistics & Data Science @ UCLA · Data Scientist · Machine Learning Scientist",
+  "heroLocation": "St. Louis → Los Angeles",
+  "about": [
+    "I'm a data scientist passionate about using data and machine learning techniques to make an impact in helping solve critical problems."
+  ],
+  "experience": [
+    {
+      "role": "Data Science Intern",
+      "organization": "AFB International",
+      "highlights": [
+        "Built classification algorithms and data pipelines to predict and optimize flavor performance using ingredient ratios and trial metadata.",
+        "Restructured trial processes to boost statistical power by blocking on key features correlating with historical flavor preferences.",
+        "Used I-optimal trial selection to identify which trials to prioritize for maximum information gain and reduced uncertainty in the model feedback loop."
+      ],
+      "software": "Python (Pandas, NumPy, scikit-learn, matplotlib), SQL, Microsoft Office (Excel, Word, PowerPoint)",
+      "methods": "XGBoost/SHAP, Random Forest, logistic/linear regression, K-means clustering, ANOVA/chi-square tests, regularization, dimension reduction (UMAP, PCA)"
+    },
+    {
+      "role": "Research Intern",
+      "organization": "UCLA Artificial Intelligence & Cultural Heritage Laboratory",
+      "highlights": [
+        "Clustered questions from 15,000+ large-scale text documents into groups of semantic similarity, leveraging automated pronoun disambiguation.",
+        "Built a hybrid pipeline: initial embedding screenings to filter unlikely matches, then a cross-attention model with the right context window to maximize cluster assignment quality.",
+        "Automated cluster quality evaluation by comparing each vector’s distance to its cluster centroid—reverse-engineering a “cluster theme”—then used it as a baseline for an LLM to grade compactness with contextual reasoning."
+      ],
+      "software": "Python (PyTorch, Pandas, NumPy, scikit-learn, matplotlib, NLTK, Hugging Face, SBERT), Linux",
+      "methods": "K-means / HDBSCAN / DBSCAN clustering, logistic/linear regression, LLMs, text embeddings, dimension reduction (UMAP/PCA), silhouette scores"
+    },
+    {
+      "role": "ML President",
+      "organization": "Bruin Machine Learning & Analytics",
+      "highlights": [
+        "Lead the ML aspect of projects spanning stock portfolio optimization, F1 race predictions, and audio wavelength decomposition.",
+        "Teach a weekly ML curriculum to 30+ members—foundational topics in depth plus high-level views of recent advances and current research."
+      ],
+      "software": "",
+      "methods": ""
+    }
+  ],
+  "programming": {
+    "languages": "Python, SQL, R, C++, Java, Tableau, MATLAB",
+    "libraries": "TensorFlow, PyTorch, scikit-learn, Pandas, NumPy, LangChain, Pinecone, Streamlit, SBERT/OpenAI"
+  },
+  "projects": [
+    {
+      "title": "Transit Deserts: Who the Los Angeles Metro System Leaves Behind",
+      "description": "Interface that geostatistically analyzes the LA public transportation system’s routes and connectivity. Surfaces which geographical, socioeconomic, natural, and other demographic factors are underrepresented.",
+      "tech": ["Geospatial", "Statistics", "Python"],
+      "links": { "repo": "", "demo": "" }
+    },
+    {
+      "title": "TwistEd",
+      "description": "Real-time weather alerts, safest recommended travel routes, and an interactive chatbot for historical questions—plus an educational section on severe weather types and precautions.",
+      "tech": ["ML", "NLP", "Weather APIs"],
+      "links": { "repo": "", "demo": "" }
+    },
+    {
+      "title": "CoursePlanner AI Chatbot",
+      "description": "Uses UCLA’s Developer API with LangChain and Pinecone to help students build optimized course plans from natural language. Contextualizes top matches when justifying recommendations.",
+      "tech": ["LangChain", "Pinecone", "LLMs"],
+      "links": { "repo": "", "demo": "" }
+    },
+    {
+      "title": "Analogy LLM",
+      "description": "Building an LLM that explains mathematical concepts in the context of another field through strong analogies.",
+      "tech": ["LLMs", "Education", "Research"],
+      "links": { "repo": "", "demo": "" }
+    }
+  ],
+  "contact": {
+    "email": "kaarya583@gmail.com",
+    "github": "https://github.com/kaarya583",
+    "linkedin": "https://www.linkedin.com/in/aaryakhanna/"
+  }
+}

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Aarya Khanna — Statistics, machine learning, and data science. UCLA."
+    />
+    <title>Aarya Khanna — Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Outfit:wght@300;400;500;600;700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <p id="load-error" class="load-error wrap" hidden>
+      Could not load <code>content.json</code>. Open this site over HTTP (e.g. GitHub Pages) or run a local server in the project folder.
+    </p>
+
+    <div class="bg-noise" aria-hidden="true"></div>
+    <div class="bg-grid" aria-hidden="true"></div>
+
+    <header class="site-header">
+      <div class="wrap">
+        <a href="#top" class="logo" id="site-name">Aarya Khanna</a>
+        <nav class="nav" aria-label="Primary">
+          <a href="#about">About</a>
+          <a href="#experience">Experience</a>
+          <a href="#programming">Stack</a>
+          <a href="#projects">Projects</a>
+          <a href="#contact">Contact</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="wrap hero-inner">
+          <p class="hero-eyebrow" id="hero-eyebrow">Data science · UCLA</p>
+          <h1 id="hero-name">Aarya Khanna</h1>
+          <p class="tagline-pipes" id="tagline"></p>
+          <p class="hero-subtitle" id="hero-subtitle"></p>
+          <p class="hero-location" id="hero-location"></p>
+          <div class="hero-cta">
+            <a class="btn btn-primary" href="#projects">View projects</a>
+            <a class="btn btn-ghost" href="#contact">Contact</a>
+            <a
+              class="btn btn-ghost btn-icon"
+              id="hero-github"
+              href="https://github.com/kaarya583"
+              target="_blank"
+              rel="noopener noreferrer"
+              >GitHub</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <section id="about" aria-labelledby="about-heading">
+        <div class="wrap section-inner">
+          <p class="section-label">About</p>
+          <h2 id="about-heading">About me</h2>
+          <div class="about-text prose" id="about-body"></div>
+        </div>
+      </section>
+
+      <section id="experience" aria-labelledby="experience-heading">
+        <div class="wrap section-inner">
+          <p class="section-label">Experience</p>
+          <h2 id="experience-heading">Where I’ve worked</h2>
+          <div class="timeline" id="experience-body"></div>
+        </div>
+      </section>
+
+      <section id="programming" aria-labelledby="programming-heading">
+        <div class="wrap section-inner">
+          <p class="section-label">Programming</p>
+          <h2 id="programming-heading">Languages & tools</h2>
+          <div class="skill-panels" id="programming-body"></div>
+        </div>
+      </section>
+
+      <section id="projects" aria-labelledby="projects-heading">
+        <div class="wrap section-inner">
+          <p class="section-label">Projects</p>
+          <h2 id="projects-heading">Selected work</h2>
+          <div class="projects-grid" id="projects-grid"></div>
+        </div>
+      </section>
+
+      <section id="contact" aria-labelledby="contact-heading">
+        <div class="wrap section-inner">
+          <p class="section-label">Contact</p>
+          <h2 id="contact-heading">Let’s connect</h2>
+          <div class="contact-block" id="contact-body"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <p>
+          © <span id="year"></span>
+          <span id="footer-name">Aarya Khanna</span>
+          <span class="footer-dot">·</span>
+          <a href="https://pages.github.com/">GitHub Pages</a>
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
+    <script src="./app.js" defer></script>
+  </body>
+</html>

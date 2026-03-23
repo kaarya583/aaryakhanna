@@ -39,9 +39,9 @@
       "slug": "transit-deserts",
       "title": "Transit Deserts: Who the Los Angeles Metro System Leaves Behind",
       "bullets": [
-        "County-scale planning analysis: job accessibility by transit, transit desert mapping, and rail corridor screening.",
-        "Reproducible pipeline: Census / LEHD / ACS + GTFS; graph Laplacian and effective resistance; publication-style figure suite.",
-        "Screening metric\u2014not a ridership model: high endpoint activity \u00d7 structural bottleneck on the existing rail graph."
+        "LA County screening: job accessibility, desert mapping, rail corridor ranking.",
+        "Census + LEHD + GTFS; Laplacian pseudoinverse and effective resistance.",
+        "Heuristic score\u2014not a ridership or engineering model."
       ],
       "tech": [
         "Geospatial",
@@ -55,108 +55,110 @@
       },
       "detail": {
         "intro": [
-          "This repository delivers a planning-oriented spatial analysis for Los Angeles County. It quantifies where transit-connected job opportunity is thin, labels high-need tracts, and ranks candidate rail corridor segments using network structure and local activity\u2014all in one reproducible workflow.",
-          "The emphasis is on methodological transparency: explicit inputs, fixed thresholds, and outputs that peers or technical reviewers can audit. It is not a ridership forecast or an engineering alignment study."
+          "This project is a reproducible planning screen for Los Angeles County. It estimates tract-level job accessibility by a simplified transit skim, labels high-need tracts, and ranks candidate station-to-station segments using network structure and local activity.",
+          "The audience is technical: peers, hiring managers, or planners who want assumptions and outputs in the open. It does not predict ridership or select alignments."
         ],
         "sections": [
           {
             "title": "Purpose",
-            "paragraphs": [
-              "Three questions drive the analysis.",
-              {
-                "segments": [
-                  {
-                    "text": "(1) Where do tracts exhibit low job accessibility by transit within a fixed time budget? (2) Where are "
-                  },
-                  {
-                    "latex": "\\text{transit deserts}",
-                    "display": false
-                  },
-                  {
-                    "text": "\u2014tracts in the lower tail of that accessibility distribution? (3) Among candidate segments between high-activity stations, which pairs rank highest on "
-                  },
-                  {
-                    "latex": "\\text{endpoint demand} \\times R_{\\mathrm{eff}}",
-                    "display": false
-                  },
-                  {
-                    "text": " on the current rail graph?"
-                  }
-                ]
-              },
-              "Results are meant to inform screening and equity discussion, not to substitute for operations modeling or community process."
+            "bullets": [
+              "Where is cumulative job accessibility by transit (\u226430 min) systematically low?",
+              "Which tracts sit in the lower tail of that distribution (\u201ctransit deserts\u201d) for this snapshot?",
+              "Which high-activity station pairs look promising under endpoint demand \u00d7 effective resistance on today\u2019s rail graph?",
+              "Outputs support screening and review\u2014not detailed operations modeling or community substitution."
             ]
           },
           {
-            "title": "Data & geography",
-            "paragraphs": [
-              "The unit of analysis is the census tract, restricted to LA County (GEOID prefix 06037). Figures use a consistent map extent (config-driven bounding box).",
-              "Core inputs: tract boundaries (Census TIGER/Line); LEHD WAC workplace job counts by tract; ACS tract estimates for population and median income; GTFS archives\u2014stops in the analysis window for accessibility, and rail-like route types for the graph layer."
+            "title": "Data",
+            "bullets": [
+              "Geography: LA County census tracts; consistent map bbox across figures.",
+              "Employment: LEHD WAC jobs by tract; ACS for population and median income.",
+              "Transit: GTFS feeds\u2014full stop set for accessibility skims; rail-like routes for the network graph."
             ]
           },
           {
-            "title": "Tract accessibility & transit deserts",
+            "title": "Accessibility & transit deserts",
+            "bullets": [
+              "Nearest-stop skim: walk legs, in-vehicle great-circle time at an effective speed, fixed wait\u2014no mode choice or timetable routing.",
+              "Accessibility = sum of jobs reachable under a 30-minute OD time cap (cumulative opportunity).",
+              "Deserts: tracts at or below the 20th percentile of tract accessibility (relative to the modeled county)."
+            ],
             "paragraphs": [
               {
                 "segments": [
                   {
-                    "text": "Each origin tract centroid is linked to its nearest GTFS stop; destination tracts with jobs are treated similarly. Walking uses Euclidean approximation; in-vehicle movement uses great-circle distance at an effective speed; a uniform wait term is added. Let "
+                    "text": "Notation: "
                   },
                   {
                     "latex": "T_{od}",
                     "display": false
                   },
                   {
-                    "text": " be total time from tract "
-                  },
-                  {
-                    "latex": "o",
-                    "display": false
-                  },
-                  {
-                    "text": " to tract "
-                  },
-                  {
-                    "latex": "d",
-                    "display": false
-                  },
-                  {
-                    "text": ". Jobs are accumulated where "
+                    "text": " is total OD time; jobs enter the sum where "
                   },
                   {
                     "latex": "T_{\\mathrm{total}} \\leq 30\\ \\mathrm{min}",
                     "display": false
                   },
                   {
-                    "text": " (cumulative opportunity measure; no gravity decay)."
+                    "text": "."
                   }
                 ]
               },
+              "Figure 1 pairs the accessibility surface with the binary desert layer derived from that percentile rule."
+            ],
+            "figures": [
               {
-                "segments": [
-                  {
-                    "text": "A tract is labeled a transit desert if its accessibility falls at or below the "
-                  },
-                  {
-                    "latex": "20^{\\mathrm{th}}",
-                    "display": false
-                  },
-                  {
-                    "text": " percentile among tracts\u2014an intentionally relative threshold within the modeled snapshot."
-                  }
-                ]
-              },
-              "Transfers, headways, and realistic pathfinding are out of scope; the layer functions as a spatial prior for where connected job opportunity is scarce."
+                "src": "https://raw.githubusercontent.com/kaarya583/transit-deserts/main/outputs/figures/01_accessibility_and_deserts.png",
+                "alt": "Tract accessibility and transit desert maps",
+                "caption": "Figure 1 \u2014 Countywide accessibility (left) and desert mask (bottom 20%). This is the \u201cneed\u201d view before corridor scoring."
+              }
             ]
           },
           {
             "title": "Rail graph & effective resistance",
+            "bulletsFirst": false,
             "paragraphs": [
-              "Stops from GTFS rail-family routes form the node set. Edges connect consecutive stops along trips (weights in meters); short transfer links connect nearby platforms. Analysis keeps the largest connected component so spectral quantities are well-defined.",
+              "Stops from rail-family GTFS routes define nodes; consecutive stops along trips are edges (meters). Transfer links connect nearby platforms. The largest connected component is retained.",
               {
                 "segments": [
                   {
-                    "text": "Edge conductance (inverse of resistance in an electrical analogy) is "
+                    "text": "Conductance on edge "
+                  },
+                  {
+                    "latex": "(i,j)",
+                    "display": false
+                  },
+                  {
+                    "text": " uses distance "
+                  },
+                  {
+                    "latex": "d_{ij}",
+                    "display": false
+                  },
+                  {
+                    "text": " (m). Then "
+                  },
+                  {
+                    "latex": "L = D - A",
+                    "display": false
+                  },
+                  {
+                    "text": " and the pseudoinverse "
+                  },
+                  {
+                    "latex": "L^{+}",
+                    "display": false
+                  },
+                  {
+                    "text": " yield effective resistance between stations "
+                  },
+                  {
+                    "latex": "a,b",
+                    "display": false
+                  },
+                  {
+                    "text": ":"
                   }
                 ]
               }
@@ -175,184 +177,129 @@
               {
                 "segments": [
                   {
-                    "text": "Form the weighted Laplacian "
-                  },
-                  {
-                    "latex": "L = D - A",
-                    "display": false
-                  },
-                  {
-                    "text": " and its Moore\u2013Penrose pseudoinverse "
-                  },
-                  {
-                    "latex": "L^{+}",
-                    "display": false
-                  },
-                  {
-                    "text": ". Effective resistance between stations "
-                  },
-                  {
-                    "latex": "a",
-                    "display": false
-                  },
-                  {
-                    "text": " and "
-                  },
-                  {
-                    "latex": "b",
-                    "display": false
-                  },
-                  {
-                    "text": " is"
-                  }
-                ]
-              },
-              {
-                "segments": [
-                  {
-                    "text": "Larger "
+                    "text": "Higher "
                   },
                   {
                     "latex": "R_{\\mathrm{eff}}",
                     "display": false
                   },
                   {
-                    "text": " indicates pairs that are poorly connected by parallel paths on the present topology. A diagnostic "
+                    "text": " marks pairs that are hard to connect with parallel paths on the current topology."
+                  }
+                ]
+              },
+              {
+                "segments": [
+                  {
+                    "text": "Diagnostic only: "
                   },
                   {
                     "latex": "f^{\\top} L f",
                     "display": false
                   },
                   {
-                    "text": " (tract accessibility smoothed on the graph) is computed separately and is not part of the corridor ranking."
+                    "text": " with tract accessibility near stations\u2014not used in the corridor rank."
                   }
                 ]
               }
             ]
           },
           {
-            "title": "Station weights & corridor score",
-            "paragraphs": [
+            "title": "Corridors & impact score",
+            "bullets": [
               {
                 "segments": [
                   {
-                    "text": "Within an "
+                    "text": "Station weight from population and jobs within "
                   },
                   {
                     "latex": "800\\ \\mathrm{m}",
                     "display": false
                   },
                   {
-                    "text": " buffer of each graph station, population and jobs are summed using tract centroids. The station weight is "
-                  }
-                ]
-              },
-              {
-                "segments": [
+                    "text": ": "
+                  },
                   {
                     "latex": "w_s = \\sqrt{\\max(\\mathrm{pop},1)\\cdot\\max(\\mathrm{jobs},1)}",
                     "display": false
                   },
                   {
-                    "text": "\u2014a strictly positive activity proxy, not observed ridership."
+                    "text": " (activity proxy, not ridership)."
                   }
                 ]
               },
               {
                 "segments": [
                   {
-                    "text": "Among high-"
+                    "text": "Candidates: seeded random pairs among top-"
                   },
                   {
                     "latex": "w_s",
                     "display": false
                   },
                   {
-                    "text": " stations, random pairs (seeded, capped separation) define candidates. The screening score is "
+                    "text": " stations, with a maximum separation cap."
                   }
                 ]
               },
               {
                 "segments": [
                   {
-                    "latex": "\\mathrm{impact} = (w_a\\, w_b)\\cdot R_{\\mathrm{eff}}(a,b)",
+                    "text": "Impact score: "
+                  },
+                  {
+                    "latex": "(w_a\\, w_b)\\cdot R_{\\mathrm{eff}}(a,b)",
                     "display": false
                   },
                   {
-                    "text": ". Buffer-level summaries (mean accessibility, desert share) are logged for context but "
-                  },
-                  {
-                    "latex": "\\textit{not}",
-                    "display": false
-                  },
-                  {
-                    "text": " multiplied into the score."
+                    "text": ". Corridor buffer stats are logged but not multiplied into the score."
                   }
                 ]
+              }
+            ],
+            "paragraphs": [
+              "Figure 4 places the highest-scoring segments in geographic context\u2014an illustrative priority map, not a proposed alignment."
+            ],
+            "figures": [
+              {
+                "src": "https://raw.githubusercontent.com/kaarya583/transit-deserts/main/outputs/figures/04_corridor_candidates_map.png",
+                "alt": "Top corridor candidates on map",
+                "caption": "Figure 4 \u2014 Top segments by impact score on the study bbox. Use ranks, not raw magnitude, when comparing runs."
               }
             ]
           },
           {
-            "title": "Outputs & indicative run",
+            "title": "Outputs",
+            "bullets": [
+              "Geo tables (e.g. tract accessibility), run summaries, `corridor_priorities.csv`.",
+              "Representative run: ~2.5k tracts; ~quarter flagged desert under the percentile rule; sparse rail graph (order tens of nodes/edges)\u2014exact numbers live in your `summary.csv`."
+            ],
             "paragraphs": [
-              "Deliverables include processed tract layers (GeoJSON / Parquet), run summaries, `corridor_priorities.csv`, and seven matplotlib figures.",
-              "One completed run is on the order of ~2,500 tracts; roughly a quarter flagged as desert under the percentile rule; a sparse rail graph on the order of tens of nodes and edges. Raw impact products span large dynamic range\u2014interpret ranks and normalized charts, not raw magnitudes alone."
+              "Figure 7 mirrors the CSV: human-readable anchors for which stations define each top corridor."
+            ],
+            "figures": [
+              {
+                "src": "https://raw.githubusercontent.com/kaarya583/transit-deserts/main/outputs/figures/07_corridor_results_table.png",
+                "alt": "Top corridors table",
+                "caption": "Figure 7 \u2014 Tabular summary of top corridors (stations, length, demand, R_eff, impact) aligned with the pipeline CSV."
+              }
             ]
           },
           {
             "title": "Limitations",
             "bullets": [
-              "Accessibility times are stylized (nearest stop, no full routing).",
-              "Desert labels are region-relative, not an absolute service standard.",
-              "Corridor sampling is bounded; ranks are conditional on the generator.",
-              "The impact metric is a heuristic screen\u2014not a build recommendation.",
-              "Effective resistance depends on graph construction (modes, transfers, component choice)."
+              "Skim times are stylized (nearest stop, no full routing).",
+              "Desert label is snapshot- and region-relative.",
+              "Corridor list is generator-dependent, not exhaustive.",
+              "Impact is a screen\u2014not a build mandate.",
+              "Resistance depends on graph coding (modes, transfers, component)."
             ]
           }
         ],
-        "visualsTitle": "Results & figures",
-        "visuals": [
-          {
-            "src": "https://raw.githubusercontent.com/kaarya583/transit-deserts/main/outputs/figures/01_accessibility_and_deserts.png",
-            "alt": "Accessibility and transit desert maps",
-            "caption": "Figure 1 \u2014 Tract job accessibility (left) and binary transit desert flag (bottom 20%). Baseline view of spatial inequality under the simplified access model."
-          },
-          {
-            "src": "https://raw.githubusercontent.com/kaarya583/transit-deserts/main/outputs/figures/02_income_vs_accessibility.png",
-            "alt": "Income versus accessibility",
-            "caption": "Figure 2 \u2014 Median tract income versus accessibility; desert tracts emphasized. Descriptive equity view (not causal)."
-          },
-          {
-            "src": "https://raw.githubusercontent.com/kaarya583/transit-deserts/main/outputs/figures/03_metro_network_demand.png",
-            "alt": "Rail network and demand",
-            "caption": "Figure 3 \u2014 Rail edges and station markers scaled by log demand proxy. Overlap of infrastructure and local activity."
-          },
-          {
-            "src": "https://raw.githubusercontent.com/kaarya583/transit-deserts/main/outputs/figures/04_corridor_candidates_map.png",
-            "alt": "Corridor candidates map",
-            "caption": "Figure 4 \u2014 Top corridor segments by impact score; geographic priority map (illustrative, not an alignment)."
-          },
-          {
-            "src": "https://raw.githubusercontent.com/kaarya583/transit-deserts/main/outputs/figures/05_corridor_impact_metrics.png",
-            "alt": "Impact metric decomposition",
-            "caption": "Figure 5 \u2014 Normalized demand, effective resistance, and impact (each scaled to its own maximum for comparison)."
-          },
-          {
-            "src": "https://raw.githubusercontent.com/kaarya583/transit-deserts/main/outputs/figures/06_corridors_on_deserts.png",
-            "alt": "Corridors on deserts",
-            "caption": "Figure 6 \u2014 Priority segments overlaid on desert tracts; joint view of score and need."
-          },
-          {
-            "src": "https://raw.githubusercontent.com/kaarya583/transit-deserts/main/outputs/figures/07_corridor_results_table.png",
-            "alt": "Corridor results table",
-            "caption": "Figure 7 \u2014 Tabular summary of top corridors (stations, length, demand, resistance, impact)."
-          }
-        ],
         "frameworks": [
-          "Python 3 \u00b7 GeoPandas \u00b7 Shapely \u00b7 pandas \u00b7 NumPy \u00b7 SciPy",
-          "matplotlib (figures 01\u201307)",
-          "GTFS ingestion; Census / ACS / LEHD joins",
-          "Entry points: `scripts/run_la_analysis.py`; modules `src/la_analysis.py`, `src/transport_graph.py`, `src/viz_la.py`; configuration in `src/config.py`"
+          "Python \u00b7 GeoPandas \u00b7 Shapely \u00b7 pandas \u00b7 NumPy \u00b7 SciPy \u00b7 matplotlib",
+          "GTFS, Census / ACS / LEHD",
+          "`scripts/run_la_analysis.py` \u00b7 `src/la_analysis.py` \u00b7 `src/transport_graph.py` \u00b7 `src/viz_la.py` \u00b7 `src/config.py`"
         ]
       }
     },

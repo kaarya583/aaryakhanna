@@ -68,6 +68,25 @@ function renderEquation(eq) {
     : `<p class="katex-inline-line"><span class="katex-inline-wrap">${span}</span></p>`;
 }
 
+function renderFigureCard(v) {
+  if (!v) return "";
+  const src = v.src && String(v.src).trim();
+  const cap = v.caption ? `<figcaption>${esc(v.caption)}</figcaption>` : "";
+  if (src) {
+    const alt = v.alt || v.caption || "";
+    return `<figure class="project-figure project-figure-intext"><img class="project-figure-img" src="${esc(src)}" alt="${esc(alt)}" loading="lazy" />${cap}</figure>`;
+  }
+  return `<figure class="project-figure project-figure-placeholder project-figure-intext"><div class="project-figure-inner" role="img" aria-label="Placeholder"></div>${cap}</figure>`;
+}
+
+function renderSectionFigures(s) {
+  const list = [];
+  if (s.figure) list.push(s.figure);
+  if (Array.isArray(s.figures)) list.push(...s.figures);
+  if (!list.length) return "";
+  return `<div class="project-section-figures">${list.map(renderFigureCard).join("")}</div>`;
+}
+
 function renderSections(sections) {
   if (!Array.isArray(sections) || !sections.length) return "";
   return sections
@@ -75,14 +94,19 @@ function renderSections(sections) {
       const head = s.title
         ? `<h3 class="project-deep-h project-deep-section-h">${esc(s.title)}</h3>`
         : "";
+      const bulletsHtml = (s.bullets || []).length
+        ? `<ul class="project-framework-list">${s.bullets.map(renderBulletItem).join("")}</ul>`
+        : "";
       const paras = (s.paragraphs || [])
         .map((p) => renderParagraphItem(p))
         .join("");
       const eqs = (s.equations || []).map(renderEquation).join("");
-      const bullets = (s.bullets || []).length
-        ? `<ul class="project-framework-list">${s.bullets.map(renderBulletItem).join("")}</ul>`
-        : "";
-      return `<div class="project-deep-block project-deep-section">${head}${paras}${eqs}${bullets}</div>`;
+      const figs = renderSectionFigures(s);
+      const leadBullets = s.bulletsFirst !== false;
+      const body = leadBullets
+        ? `${bulletsHtml}${paras}${eqs}`
+        : `${paras}${eqs}${bulletsHtml}`;
+      return `<div class="project-deep-block project-deep-section">${head}${body}${figs}</div>`;
     })
     .join("");
 }

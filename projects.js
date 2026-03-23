@@ -102,11 +102,16 @@ function renderSections(sections) {
         .join("");
       const eqs = (s.equations || []).map(renderEquation).join("");
       const figs = renderSectionFigures(s);
+      const hasFigs = Boolean(figs);
       const leadBullets = s.bulletsFirst !== false;
       const body = leadBullets
         ? `${bulletsHtml}${paras}${eqs}`
         : `${paras}${eqs}${bulletsHtml}`;
-      return `<div class="project-deep-block project-deep-section">${head}${body}${figs}</div>`;
+      const cls = hasFigs
+        ? "project-deep-block project-deep-section has-figures"
+        : "project-deep-block project-deep-section";
+      const main = `<div class="project-section-main">${head}${body}</div>`;
+      return `<div class="${cls}">${main}${figs}</div>`;
     })
     .join("");
 }

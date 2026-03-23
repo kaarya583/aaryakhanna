@@ -881,7 +881,7 @@ section:not(:last-of-type) {
   color: var(--text-muted);
   font-size: 1.02rem;
   line-height: 1.7;
-  max-width: 72ch;
+  max-width: none;
 }
 
 .project-deep-prose p:last-child {
@@ -897,7 +897,7 @@ section:not(:last-of-type) {
   color: var(--text-muted);
   font-size: 1.05rem;
   line-height: 1.72;
-  max-width: 72ch;
+  max-width: none;
 }
 
 .project-deep-lead:last-child {
@@ -955,7 +955,7 @@ section:not(:last-of-type) {
   margin: 0;
   color: var(--text-muted);
   line-height: 1.65;
-  max-width: 72ch;
+  max-width: none;
   font-size: 0.98rem;
 }
 
@@ -981,30 +981,36 @@ section:not(:last-of-type) {
 }
 
 .project-section-figures {
-  margin-top: 1.35rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
+  margin-top: 0.25rem;
 }
 
 .project-figure-intext {
-  max-width: min(100%, 920px);
-  margin-left: auto;
-  margin-right: auto;
+  margin: 0;
 }
 
 .project-figure-intext img {
-  max-height: min(70vh, 560px);
+  max-height: 70vh;
   object-fit: contain;
-  background: rgba(0, 0, 0, 0.2);
+  background: transparent;
+}
+
+.project-deep-section.has-figures {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.95fr);
+  gap: 1.2rem 2rem;
+  align-items: start;
+}
+
+.project-deep-section.has-figures .project-section-main {
+  min-width: 0;
 }
 
 .project-figure {
   margin: 0;
-  border-radius: var(--radius);
-  overflow: hidden;
-  border: 1px solid var(--border);
-  background: var(--bg-card);
+  border-radius: 0;
+  overflow: visible;
+  border: none;
+  background: transparent;
 }
 
 .project-figure-img {
@@ -1015,11 +1021,11 @@ section:not(:last-of-type) {
 }
 
 .project-figure figcaption {
-  padding: 0.65rem 1rem;
+  padding: 0.45rem 0 0;
   font-size: 0.88rem;
   color: var(--text-muted);
   line-height: 1.45;
-  border-top: 1px solid var(--border);
+  border-top: none;
 }
 
 .project-figure-placeholder .project-figure-inner {
@@ -1088,5 +1094,16 @@ section:not(:last-of-type) {
 
   .timeline-card {
     padding-left: 1.85rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .project-deep-section.has-figures {
+    grid-template-columns: 1fr;
+    gap: 0.9rem;
+  }
+
+  .project-section-figures {
+    margin-top: 0.2rem;
   }
 }

@@ -41,7 +41,7 @@
       "bullets": [
         "LA County screening: job accessibility, desert mapping, rail corridor ranking.",
         "Census + LEHD + GTFS; Laplacian pseudoinverse and effective resistance.",
-        "Heuristic score\u2014not a ridership or engineering model."
+        "Heuristic score not a ridership or engineering model."
       ],
       "tech": [
         "Geospatial",
@@ -55,8 +55,7 @@
       },
       "detail": {
         "intro": [
-          "This project is a reproducible planning screen for Los Angeles County. It estimates tract-level job accessibility by a simplified transit skim, labels high-need tracts, and ranks candidate station-to-station segments using network structure and local activity.",
-          "The audience is technical: peers, hiring managers, or planners who want assumptions and outputs in the open. It does not predict ridership or select alignments."
+          "This project is a reproducible planning screen for Los Angeles County. It estimates tract-level job accessibility by a simplified transit skim, labels high-need tracts, and ranks candidate station-to-station segments using network structure and local activity."
         ],
         "sections": [
           {
@@ -64,8 +63,7 @@
             "bullets": [
               "Where is cumulative job accessibility by transit (\u226430 min) systematically low?",
               "Which tracts sit in the lower tail of that distribution (\u201ctransit deserts\u201d) for this snapshot?",
-              "Which high-activity station pairs look promising under endpoint demand \u00d7 effective resistance on today\u2019s rail graph?",
-              "Outputs support screening and review\u2014not detailed operations modeling or community substitution."
+              "Which high-activity station pairs look promising under endpoint demand \u00d7 effective resistance on today\u2019s rail graph?"
             ]
           },
           {
@@ -73,13 +71,13 @@
             "bullets": [
               "Geography: LA County census tracts; consistent map bbox across figures.",
               "Employment: LEHD WAC jobs by tract; ACS for population and median income.",
-              "Transit: GTFS feeds\u2014full stop set for accessibility skims; rail-like routes for the network graph."
+              "Transit: GTFS feeds full stop set for accessibility skims; rail-like routes for the network graph."
             ]
           },
           {
             "title": "Accessibility & transit deserts",
             "bullets": [
-              "Nearest-stop skim: walk legs, in-vehicle great-circle time at an effective speed, fixed wait\u2014no mode choice or timetable routing.",
+              "Nearest-stop skim: walk legs, in-vehicle great-circle time at an effective speed, fixed wait no mode choice or timetable routing.",
               "Accessibility = sum of jobs reachable under a 30-minute OD time cap (cumulative opportunity).",
               "Deserts: tracts at or below the 20th percentile of tract accessibility (relative to the modeled county)."
             ],
@@ -111,7 +109,7 @@
               {
                 "src": "https://raw.githubusercontent.com/kaarya583/transit-deserts/main/outputs/figures/01_accessibility_and_deserts.png",
                 "alt": "Tract accessibility and transit desert maps",
-                "caption": "Figure 1 \u2014 Countywide accessibility (left) and desert mask (bottom 20%). This is the \u201cneed\u201d view before corridor scoring."
+                "caption": "Figure 1   Countywide accessibility (left) and desert mask (bottom 20%). This is the \u201cneed\u201d view before corridor scoring."
               }
             ]
           },
@@ -198,7 +196,7 @@
                     "display": false
                   },
                   {
-                    "text": " with tract accessibility near stations\u2014not used in the corridor rank."
+                    "text": " with tract accessibility near stations not used in the corridor rank."
                   }
                 ]
               }
@@ -258,48 +256,26 @@
               }
             ],
             "paragraphs": [
-              "Figure 4 places the highest-scoring segments in geographic context\u2014an illustrative priority map, not a proposed alignment."
+              "Figure 4 places high-scoring segments in geographic context. It is a screening map, not a proposed alignment."
             ],
             "figures": [
               {
                 "src": "https://raw.githubusercontent.com/kaarya583/transit-deserts/main/outputs/figures/04_corridor_candidates_map.png",
                 "alt": "Top corridor candidates on map",
-                "caption": "Figure 4 \u2014 Top segments by impact score on the study bbox. Use ranks, not raw magnitude, when comparing runs."
+                "caption": "Figure 4: Top segments by impact score in the study area. Compare by rank rather than raw magnitude."
               }
             ]
           },
           {
-            "title": "Outputs",
-            "bullets": [
-              "Geo tables (e.g. tract accessibility), run summaries, `corridor_priorities.csv`.",
-              "Representative run: ~2.5k tracts; ~quarter flagged desert under the percentile rule; sparse rail graph (order tens of nodes/edges)\u2014exact numbers live in your `summary.csv`."
-            ],
-            "paragraphs": [
-              "Figure 7 mirrors the CSV: human-readable anchors for which stations define each top corridor."
-            ],
+            "title": "Top corridor outputs",
             "figures": [
               {
                 "src": "https://raw.githubusercontent.com/kaarya583/transit-deserts/main/outputs/figures/07_corridor_results_table.png",
                 "alt": "Top corridors table",
-                "caption": "Figure 7 \u2014 Tabular summary of top corridors (stations, length, demand, R_eff, impact) aligned with the pipeline CSV."
+                "caption": "Top ranked corridors with endpoints, length, demand, R_eff, and impact score."
               }
             ]
-          },
-          {
-            "title": "Limitations",
-            "bullets": [
-              "Skim times are stylized (nearest stop, no full routing).",
-              "Desert label is snapshot- and region-relative.",
-              "Corridor list is generator-dependent, not exhaustive.",
-              "Impact is a screen\u2014not a build mandate.",
-              "Resistance depends on graph coding (modes, transfers, component)."
-            ]
           }
-        ],
-        "frameworks": [
-          "Python \u00b7 GeoPandas \u00b7 Shapely \u00b7 pandas \u00b7 NumPy \u00b7 SciPy \u00b7 matplotlib",
-          "GTFS, Census / ACS / LEHD",
-          "`scripts/run_la_analysis.py` \u00b7 `src/la_analysis.py` \u00b7 `src/transport_graph.py` \u00b7 `src/viz_la.py` \u00b7 `src/config.py`"
         ]
       }
     },

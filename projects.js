@@ -1,6 +1,6 @@
 /**
  * Project deep-dive page — loads content.json and renders extended project content.
- * Supports optional detail.sections (structured write-ups) and KaTeX via detail.equations / section.equations.
+ * Supports detail.sections with plain strings or { "segments": [{ "text" }, { "latex" }] } for inline KaTeX.
  */
 
 function esc(s) {
@@ -14,6 +14,48 @@ function slugify(title) {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
+}
+
+/** Inline or display KaTeX span (filled by renderKatexInjections) */
+function katexSpan(tex, display) {
+  if (!tex) return "";
+  const t = encodeURIComponent(tex);
+  const disp = display ? "true" : "false";
+  const cls = display ? "katex-inject katex-block" : "katex-inject katex-inline-span";
+  return `<span class="${cls}" data-katex-tex="${t}" data-katex-display="${disp}"></span>`;
+}
+
+function renderSegmentedBody(segments) {
+  if (!Array.isArray(segments)) return "";
+  return segments
+    .map((seg) => {
+      if (seg == null) return "";
+      if (typeof seg === "string") return esc(seg);
+      if (seg.text != null) return esc(seg.text);
+      if (seg.latex != null) return katexSpan(seg.latex, !!seg.display);
+      return "";
+    })
+    .join("");
+}
+
+function renderParagraphItem(p) {
+  if (typeof p === "string") {
+    return `<p class="project-deep-text">${esc(p)}</p>`;
+  }
+  if (p && Array.isArray(p.segments)) {
+    return `<p class="project-deep-text project-deep-text-rich">${renderSegmentedBody(p.segments)}</p>`;
+  }
+  return "";
+}
+
+function renderBulletItem(b) {
+  if (typeof b === "string") {
+    return `<li>${esc(b)}</li>`;
+  }
+  if (b && Array.isArray(b.segments)) {
+    return `<li class="project-rich-li">${renderSegmentedBody(b.segments)}</li>`;
+  }
+  return "";
 }
 
 function renderEquation(eq) {
@@ -34,17 +76,29 @@ function renderSections(sections) {
         ? `<h3 class="project-deep-h project-deep-section-h">${esc(s.title)}</h3>`
         : "";
       const paras = (s.paragraphs || [])
-        .map((p) => `<p class="project-deep-text">${esc(p)}</p>`)
+        .map((p) => renderParagraphItem(p))
         .join("");
-      const bullets = (s.bullets || []).length
-        ? `<ul class="project-framework-list">${s.bullets
-            .map((b) => `<li>${esc(b)}</li>`)
-            .join("")}</ul>`
-        : "";
       const eqs = (s.equations || []).map(renderEquation).join("");
-      return `<div class="project-deep-block project-deep-section">${head}${paras}${bullets}${eqs}</div>`;
+      const bullets = (s.bullets || []).length
+        ? `<ul class="project-framework-list">${s.bullets.map(renderBulletItem).join("")}</ul>`
+        : "";
+      return `<div class="project-deep-block project-deep-section">${head}${paras}${eqs}${bullets}</div>`;
     })
     .join("");
+}
+
+function renderIntro(intro) {
+  if (!Array.isArray(intro) || !intro.length) return "";
+  const html = intro.map((item) => {
+    if (typeof item === "string") {
+      return `<p class="project-deep-lead">${esc(item)}</p>`;
+    }
+    if (item && Array.isArray(item.segments)) {
+      return `<p class="project-deep-lead project-deep-text-rich">${renderSegmentedBody(item.segments)}</p>`;
+    }
+    return "";
+  }).join("");
+  return `<div class="project-deep-intro">${html}</div>`;
 }
 
 function renderVisuals(visuals, title) {
@@ -89,13 +143,18 @@ function renderKatexInjections() {
   });
 }
 
+function renderRepoCallout(repoUrl) {
+  if (!repoUrl || !String(repoUrl).trim()) return "";
+  const u = String(repoUrl).trim();
+  const short = u.replace(/^https?:\/\/(www\.)?github\.com\//, "");
+  return `<p class="project-repo-callout"><a href="${esc(u)}" target="_blank" rel="noopener noreferrer">Source code — ${esc(short)}</a></p>`;
+}
+
 function renderProjectDeep(p, i) {
   const slug = p.slug || slugify(p.title);
   const d = p.detail || {};
   const intro = Array.isArray(d.intro) ? d.intro : d.paragraphs || [];
-  const introHtml = intro.length
-    ? `<div class="project-deep-prose">${intro.map((x) => `<p>${esc(x)}</p>`).join("")}</div>`
-    : "";
+  const introHtml = intro.length ? renderIntro(intro) : "";
 
   const sectionsHtml = renderSections(d.sections);
 
@@ -136,10 +195,13 @@ function renderProjectDeep(p, i) {
       ? `<p class="project-deep-fallback muted">Add an <code>intro</code>, <code>sections</code>, <code>frameworks</code>, <code>stack</code>, <code>methods</code>, or <code>visuals</code> under <code>detail</code> for this project in <code>content.json</code>.</p>`
       : "";
 
+  const repoUrl = p.links?.repo && String(p.links.repo).trim();
+  const repoCallout = renderRepoCallout(repoUrl);
+
   const links = [];
-  if (p.links?.repo && String(p.links.repo).trim()) {
+  if (repoUrl) {
     links.push(
-      `<a class="btn btn-ghost btn-sm" href="${esc(p.links.repo)}" target="_blank" rel="noopener noreferrer">Repository</a>`
+      `<a class="btn btn-ghost btn-sm" href="${esc(repoUrl)}" target="_blank" rel="noopener noreferrer">Repository</a>`
     );
   }
   if (p.links?.demo && String(p.links.demo).trim()) {
@@ -157,6 +219,7 @@ function renderProjectDeep(p, i) {
         <span class="project-deep-num">${String(i + 1).padStart(2, "0")}</span>
         <h2 class="project-deep-title">${esc(p.title || "Untitled")}</h2>
       </header>
+      ${repoCallout}
       ${introHtml || fallback}
       ${sectionsHtml}
       ${stackNote}

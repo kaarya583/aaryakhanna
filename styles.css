@@ -888,6 +888,55 @@ section:not(:last-of-type) {
   margin-bottom: 0;
 }
 
+.project-deep-intro {
+  margin-bottom: 0.5rem;
+}
+
+.project-deep-lead {
+  margin: 0 0 1rem;
+  color: var(--text-muted);
+  font-size: 1.05rem;
+  line-height: 1.72;
+  max-width: 72ch;
+}
+
+.project-deep-lead:last-child {
+  margin-bottom: 0;
+}
+
+.project-repo-callout {
+  margin: 0 0 1.5rem;
+  padding: 0.65rem 1rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: rgba(39, 116, 174, 0.08);
+  font-size: 0.95rem;
+}
+
+.project-repo-callout a {
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.project-deep-text-rich,
+.project-rich-li {
+  line-height: 1.75;
+}
+
+.katex-inline-span {
+  display: inline-block;
+  margin: 0 0.12em;
+  vertical-align: middle;
+}
+
+.katex-inline-span .katex {
+  font-size: 1.05em;
+}
+
+.project-rich-li .katex-inline-span .katex {
+  font-size: 1em;
+}
+
 .project-deep-block {
   margin-top: 1.75rem;
 }

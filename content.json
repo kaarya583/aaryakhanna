@@ -274,7 +274,8 @@
                 "alt": "Top corridors table",
                 "caption": "Top ranked corridors with endpoints, length, demand, R_eff, and impact score."
               }
-            ]
+            ],
+            "figureSize": "large"
           }
         ]
       }

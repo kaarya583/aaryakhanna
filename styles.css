@@ -1107,3 +1107,27 @@ section:not(:last-of-type) {
     margin-top: 0.2rem;
   }
 }
+
+
+/* Large bottom table treatment */
+.project-deep-section.figure-large.has-figures {
+  grid-template-columns: 1fr;
+  gap: 0.7rem;
+}
+
+.project-deep-section.figure-large .project-section-main {
+  max-width: none;
+}
+
+.project-deep-section.figure-large .project-figure-intext {
+  width: 100%;
+}
+
+.project-deep-section.figure-large .project-figure-intext img {
+  width: 100%;
+  max-height: none;
+}
+
+.project-deep-section.section-top-corridor-outputs .project-figure figcaption {
+  font-size: 0.95rem;
+}

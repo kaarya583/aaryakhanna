@@ -107,9 +107,12 @@ function renderSections(sections) {
       const body = leadBullets
         ? `${bulletsHtml}${paras}${eqs}`
         : `${paras}${eqs}${bulletsHtml}`;
+      const sectionKind =
+        (s.title || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+      const sizeCls = s.figureSize === "large" ? " figure-large" : "";
       const cls = hasFigs
-        ? "project-deep-block project-deep-section has-figures"
-        : "project-deep-block project-deep-section";
+        ? `project-deep-block project-deep-section has-figures section-${sectionKind}${sizeCls}`
+        : `project-deep-block project-deep-section section-${sectionKind}${sizeCls}`;
       const main = `<div class="project-section-main">${head}${body}</div>`;
       return `<div class="${cls}">${main}${figs}</div>`;
     })

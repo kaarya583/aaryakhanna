@@ -1,5 +1,6 @@
 /**
  * Project deep-dive page — loads content.json and renders extended project content.
+ * Supports optional detail.sections (structured write-ups) and KaTeX via detail.equations / section.equations.
  */
 
 function esc(s) {
@@ -15,8 +16,42 @@ function slugify(title) {
     .replace(/^-|-$/g, "");
 }
 
-function renderVisuals(visuals) {
+function renderEquation(eq) {
+  if (!eq || !eq.tex) return "";
+  const tex = encodeURIComponent(eq.tex);
+  const disp = eq.display ? "true" : "false";
+  const span = `<span class="katex-inject" data-katex-tex="${tex}" data-katex-display="${disp}"></span>`;
+  return eq.display
+    ? `<div class="katex-display-wrap">${span}</div>`
+    : `<p class="katex-inline-line"><span class="katex-inline-wrap">${span}</span></p>`;
+}
+
+function renderSections(sections) {
+  if (!Array.isArray(sections) || !sections.length) return "";
+  return sections
+    .map((s) => {
+      const head = s.title
+        ? `<h3 class="project-deep-h project-deep-section-h">${esc(s.title)}</h3>`
+        : "";
+      const paras = (s.paragraphs || [])
+        .map((p) => `<p class="project-deep-text">${esc(p)}</p>`)
+        .join("");
+      const bullets = (s.bullets || []).length
+        ? `<ul class="project-framework-list">${s.bullets
+            .map((b) => `<li>${esc(b)}</li>`)
+            .join("")}</ul>`
+        : "";
+      const eqs = (s.equations || []).map(renderEquation).join("");
+      return `<div class="project-deep-block project-deep-section">${head}${paras}${bullets}${eqs}</div>`;
+    })
+    .join("");
+}
+
+function renderVisuals(visuals, title) {
   if (!Array.isArray(visuals) || !visuals.length) return "";
+  const heading = title
+    ? `<h3 class="project-deep-h">${esc(title)}</h3>`
+    : "";
   const cards = visuals
     .map((v) => {
       const src = v.src && String(v.src).trim();
@@ -28,7 +63,30 @@ function renderVisuals(visuals) {
       return `<figure class="project-figure project-figure-placeholder"><div class="project-figure-inner" role="img" aria-label="Placeholder for visualization"></div>${cap}</figure>`;
     })
     .join("");
-  return `<div class="project-visuals">${cards}</div>`;
+  return `<div class="project-deep-block project-deep-visuals-block">${heading}<div class="project-visuals">${cards}</div></div>`;
+}
+
+function renderKatexInjections() {
+  if (typeof katex === "undefined") return;
+  document.querySelectorAll(".katex-inject").forEach((el) => {
+    const raw = el.getAttribute("data-katex-tex");
+    if (!raw) return;
+    let tex;
+    try {
+      tex = decodeURIComponent(raw);
+    } catch (e) {
+      return;
+    }
+    const display = el.getAttribute("data-katex-display") === "true";
+    try {
+      katex.render(tex, el, {
+        displayMode: display,
+        throwOnError: false,
+      });
+    } catch (err) {
+      console.warn("KaTeX:", err);
+    }
+  });
 }
 
 function renderProjectDeep(p, i) {
@@ -39,32 +97,43 @@ function renderProjectDeep(p, i) {
     ? `<div class="project-deep-prose">${intro.map((x) => `<p>${esc(x)}</p>`).join("")}</div>`
     : "";
 
-  const frameworks = Array.isArray(d.frameworks) && d.frameworks.length
+  const sectionsHtml = renderSections(d.sections);
+
+  const frameworksHtml = Array.isArray(d.frameworks) && d.frameworks.length
     ? `<div class="project-deep-block">
         <h3 class="project-deep-h">Frameworks &amp; tools</h3>
         <ul class="project-framework-list">${d.frameworks.map((f) => `<li>${esc(f)}</li>`).join("")}</ul>
       </div>`
     : "";
 
-  const stackNote = d.stack && String(d.stack).trim()
-    ? `<div class="project-deep-block">
+  const stackNote =
+    d.stack && String(d.stack).trim() && !sectionsHtml
+      ? `<div class="project-deep-block">
         <h3 class="project-deep-h">Stack &amp; architecture</h3>
         <p class="project-deep-text">${esc(d.stack)}</p>
       </div>`
-    : "";
+      : "";
 
-  const methods = d.methods && String(d.methods).trim()
-    ? `<div class="project-deep-block">
+  const methods =
+    d.methods && String(d.methods).trim() && !sectionsHtml
+      ? `<div class="project-deep-block">
         <h3 class="project-deep-h">Methods</h3>
         <p class="project-deep-text">${esc(d.methods)}</p>
       </div>`
-    : "";
+      : "";
 
-  const visuals = renderVisuals(d.visuals);
+  const visualsTitle = d.visualsTitle || "Results & figures";
+  const hasVisuals = Array.isArray(d.visuals) && d.visuals.length;
+  const visuals = renderVisuals(d.visuals, hasVisuals ? visualsTitle : "");
 
   const fallback =
-    !introHtml && !frameworks && !stackNote && !methods && !visuals
-      ? `<p class="project-deep-fallback muted">Add an <code>intro</code>, <code>frameworks</code>, <code>stack</code>, <code>methods</code>, or <code>visuals</code> under <code>detail</code> for this project in <code>content.json</code>.</p>`
+    !introHtml &&
+    !sectionsHtml &&
+    !frameworksHtml &&
+    !stackNote &&
+    !methods &&
+    !visuals
+      ? `<p class="project-deep-fallback muted">Add an <code>intro</code>, <code>sections</code>, <code>frameworks</code>, <code>stack</code>, <code>methods</code>, or <code>visuals</code> under <code>detail</code> for this project in <code>content.json</code>.</p>`
       : "";
 
   const links = [];
@@ -89,10 +158,11 @@ function renderProjectDeep(p, i) {
         <h2 class="project-deep-title">${esc(p.title || "Untitled")}</h2>
       </header>
       ${introHtml || fallback}
+      ${sectionsHtml}
       ${stackNote}
       ${methods}
-      ${frameworks}
       ${visuals}
+      ${frameworksHtml}
       ${linkRow}
     </article>
   `;
@@ -124,10 +194,10 @@ function apply(data) {
   const projects = data.projects || [];
   if (tocEl) tocEl.innerHTML = renderTOC(projects);
   if (el) {
-    el.innerHTML = projects
-      .map((p, i) => renderProjectDeep(p, i))
-      .join("");
+    el.innerHTML = projects.map((p, i) => renderProjectDeep(p, i)).join("");
   }
+
+  renderKatexInjections();
 
   document.title = `${name} — Projects`;
 

@@ -984,6 +984,31 @@ section:not(:last-of-type) {
   color: var(--accent);
 }
 
+.project-deep-section-h {
+  font-size: 1.05rem;
+  letter-spacing: 0.06em;
+  margin-top: 0.15rem;
+}
+
+.katex-display-wrap {
+  margin: 1rem 0 1.15rem;
+  padding: 0.5rem 0;
+  overflow-x: auto;
+  text-align: center;
+}
+
+.katex-display-wrap .katex {
+  font-size: 1.05rem;
+}
+
+.katex-inline-line {
+  margin: 0.65rem 0;
+}
+
+.katex-inline-wrap .katex {
+  font-size: 1em;
+}
+
 @media (max-width: 640px) {
   .timeline::before {
     left: 0.45rem;

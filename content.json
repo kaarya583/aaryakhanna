@@ -2,7 +2,7 @@
   "name": "Aarya Khanna",
   "tagline": "Statistics | Machine Learning",
   "heroSubtitle": "Statistics & Data Science @ UCLA",
-  "heroLocation": "St. Louis → Los Angeles",
+  "heroLocation": "St. Louis \u2192 Los Angeles",
   "about": [
     "I'm a data scientist passionate about using data and machine learning techniques to make an impact in helping solve critical problems. My research interests include high-dimensional statistics, clustering, and manifold learning."
   ],
@@ -24,7 +24,7 @@
       "highlights": [
         "Clustered questions from 15,000+ large-scale text documents into groups of semantic similarity, leveraging automated pronoun disambiguation.",
         "Built a hybrid pipeline: initial embedding screenings to filter unlikely matches, then a cross-attention model with the right context window to maximize cluster assignment quality.",
-        "Automated cluster quality evaluation by comparing each vector’s distance to its cluster centroid—reverse-engineering a “cluster theme”—then used it as a baseline for an LLM to grade compactness with contextual reasoning."
+        "Automated cluster quality evaluation by comparing each vector\u2019s distance to its cluster centroid\u2014reverse-engineering a \u201ccluster theme\u201d\u2014then used it as a baseline for an LLM to grade compactness with contextual reasoning."
       ],
       "software": "Python (PyTorch, Pandas, NumPy, scikit-learn, matplotlib, NLTK, Hugging Face, SBERT), Linux",
       "methods": "K-means / HDBSCAN / DBSCAN clustering, logistic/linear regression, LLMs, API text embeddings, dimension reduction (UMAP/PCA), silhouette scores"
@@ -39,25 +39,139 @@
       "slug": "transit-deserts",
       "title": "Transit Deserts: Who the Los Angeles Metro System Leaves Behind",
       "bullets": [
-        "Geostatistical interface analyzing LA Metro routes and system connectivity.",
-        "Surfaces geographical, socioeconomic, and other demographic factors that are underrepresented in access.",
-        "Quantifies the impact of the Olympic Project 28 Metro D-Line extension on transit accessibility and equity."
+        "Planning-oriented spatial analysis for LA County: tract job accessibility, transit desert mapping, and rail corridor screening.",
+        "GTFS + census/LEHD/ACS; graph Laplacian effective resistance; reproducible pipeline with figures 01\u201307.",
+        "Screening heuristic (not a ridership forecast): high endpoint activity \u00d7 structural bottleneck on the current rail network."
       ],
-      "tech": ["Geospatial", "Statistics", "Python"],
-      "links": { "repo": "", "demo": "" },
+      "tech": [
+        "Geospatial",
+        "Statistics",
+        "Python",
+        "Graph theory"
+      ],
+      "links": {
+        "repo": "",
+        "demo": ""
+      },
       "detail": {
         "intro": [
-          "This project builds an analytical interface to study how LA Metro’s network structure interacts with demographics and geography—where riders are underserved relative to need or population.",
-          "The deep dive focuses on defining transit deserts in a geostatistical sense (accessibility surfaces, connectivity gaps) and on counterfactual-style analysis around the Olympic Project 28 D-Line extension."
+          "This work maps where LA County tracts have low transit-connected job opportunity within 30 minutes, labels the bottom 20% as transit deserts, and relates outcomes to income. It then builds a rail-only graph from GTFS, uses effective resistance between stations to measure network bottlenecks, weights stations by nearby population and jobs, and ranks candidate station-to-station corridors \u2014 a transparent screening tool for planning conversations, not a detailed engineering or ridership model.",
+          "Skim the sections below for the problem framing, data, methods, modeling, and results-driven visualization gallery."
         ],
-        "stack": "Modular pipeline: ingest GTFS-style route geometry and stops, build graph / accessibility layers, join census and open demographic layers, then export maps and summary tables for equity metrics.",
-        "methods": "Spatial joins, kernel-based accessibility proxies where appropriate, and comparative before/after panels for the D-Line extension scenario.",
-        "frameworks": ["Python", "GeoPandas / Shapely", "NetworkX or similar routing graphs", "matplotlib / folium for maps", "pandas"],
+        "sections": [
+          {
+            "title": "Purpose & questions",
+            "paragraphs": [
+              "The analysis answers three linked questions: (1) Where do census tracts have low job accessibility by transit within a fixed time budget? (2) Where are transit deserts \u2014 tracts in the worst tail of that accessibility distribution? (3) Among candidate rail corridor segments between high-activity stations, which pairs score highest on a simple structural \u00d7 activity proxy: endpoint activity \u00d7 how \u2018electrically distant\u2019 the pair is on today\u2019s rail graph?",
+              "It is explicitly not a ridership forecast, operations model, or alignment design. It is a reproducible screening layer that connects tract-level need, network geometry, and land-use intensity near stations."
+            ]
+          },
+          {
+            "title": "Data & geography",
+            "paragraphs": [
+              "Unit of analysis: census tracts clipped or filtered to LA County (GEOID prefix 06037). Map figures use a fixed bounding box over the LA region (config-driven).",
+              "Inputs: tract boundaries (Census shapefile); LEHD WAC job counts aggregated to tract (C000); ACS for population and median income; GTFS feeds for transit \u2014 stops in the bbox for accessibility, and rail route types for the metro graph."
+            ]
+          },
+          {
+            "title": "Tract job accessibility (\u226430 min) & transit deserts",
+            "paragraphs": [
+              "For each residential tract origin, the model estimates how many jobs in other tracts are reachable within \u226430 minutes using a simplified walk\u2013transit\u2013walk chain: nearest GTFS stop to origin and destination tract centroids, Euclidean walk legs at walk speed, great-circle transit between stops at an effective transit speed, plus a fixed wait penalty. Total time is compared to a 30-minute threshold; accessibility is the cumulative opportunity count of jobs across destinations (gravity-free).",
+              "Transit desert is defined as tracts at or below the 20th percentile of tract accessibility (job counts reachable in 30 minutes) \u2014 a relative, regional cut within the modeled snapshot. The accessibility layer is intentionally a broad spatial prior: it does not encode transfers, headways, or mode choice."
+            ]
+          },
+          {
+            "title": "Metro rail graph & effective resistance",
+            "paragraphs": [
+              "Rail-only subgraph: GTFS route types in the tram/subway/rail family; nodes are stops in the bbox; edges connect consecutive stops along trips with weight = great-circle meters; transfer edges link nearby stops within a short distance (e.g. 150 m). The largest connected component is retained so resistance is well-defined.",
+              "Edge conductance is taken as c_ij = 1/(d_ij + 1) with distance d_ij in meters. Build the weighted Laplacian L = D \u2212 A and use the Moore\u2013Penrose pseudoinverse L\u207a of L. Effective resistance between stations a and b is:"
+            ],
+            "equations": [
+              {
+                "tex": "c_{ij} = \\frac{1}{d_{ij}+1}",
+                "display": true
+              },
+              {
+                "tex": "R_{\\mathrm{eff}}(a,b) = L^{+}_{aa} + L^{+}_{bb} - 2L^{+}_{ab}",
+                "display": true
+              }
+            ],
+            "bullets": [
+              "Higher R_eff means the pair is poorly connected by parallel paths on the current topology \u2014 an electrical-network analogy.",
+              "A separate diagnostic f^T L f (mean tract accessibility near stations) summarizes graph-smoothness of accessibility; it is not the corridor ranking score."
+            ]
+          },
+          {
+            "title": "Station weights & corridor impact score",
+            "paragraphs": [
+              "Around each graph station, population and jobs are aggregated within an 800 m buffer (tract centroids via spatial index). Station weight is sqrt(max(pop,1) \u00d7 max(jobs,1)) \u2014 a smooth, strictly positive activity proxy, not observed ridership.",
+              "Candidates: top stations by weight; random station pairs (seeded) under a max great-circle separation cap. Scoring: demand_proxy = weight_a \u00d7 weight_b; impact_score = demand_proxy \u00d7 R_eff(a,b). Buffer statistics along the corridor (e.g. mean accessibility, desert share) are saved for context but are not multiplied into impact_score (per the project methodology)."
+            ]
+          },
+          {
+            "title": "Pipeline outputs & example run",
+            "paragraphs": [
+              "The pipeline writes processed tract accessibility GeoJSON/Parquet, summary CSVs (run KPIs, graph summary), corridor_priorities.csv with ranked segments, and a matplotlib figure suite (01\u201307).",
+              "One completed run (order-of-magnitude): on the order of ~2,500 tracts; ~23% flagged as desert (bottom-20% rule can produce ~20% with ties/edge effects); rail graph on the order of ~67 nodes and ~67 edges in that run; raw impact magnitudes are huge \u2014 use ranks and normalized plots, not raw scale, for intuition."
+            ]
+          },
+          {
+            "title": "Limitations",
+            "bullets": [
+              "Accessibility is a simplified OD-time approximation (nearest stop, no realistic routing).",
+              "Desert is relative to the modeled region/year \u2014 not an absolute service standard.",
+              "Corridor sampling is not exhaustive; ranks are within the generator, not a global optimum over all alignments.",
+              "Impact score is a screening heuristic \u2014 not a mandate to build.",
+              "R_eff depends on how the rail graph is coded (modes, transfers, largest component)."
+            ]
+          }
+        ],
+        "visualsTitle": "Results & figure gallery",
         "visuals": [
           {
             "src": "",
-            "caption": "Map: transit accessibility surface vs. demographic stress (drop PNG/SVG into /images/ and set src)."
+            "alt": "Accessibility and transit desert choropleths",
+            "caption": "01 \u2014 Accessibility jobs (left) and binary transit desert (bottom 20%). The problem map: spatial inequality of job opportunity under the simplified transit model."
+          },
+          {
+            "src": "",
+            "alt": "Income vs accessibility scatter",
+            "caption": "02 \u2014 Median income vs accessibility; desert tracts highlighted. Descriptive equity lens \u2014 not causal."
+          },
+          {
+            "src": "",
+            "alt": "Rail network with demand-weighted stations",
+            "caption": "03 \u2014 Rail edges and station markers scaled by log-scale demand proxy. Where rail overlaps population\u2013jobs intensity near stops."
+          },
+          {
+            "src": "",
+            "alt": "Top corridor segments on map",
+            "caption": "04 \u2014 Top corridor segments by impact score on a basemap; candidate priority geography (not a final alignment)."
+          },
+          {
+            "src": "",
+            "alt": "Normalized demand, resistance, impact bars",
+            "caption": "05 \u2014 Decomposition: demand vs R_eff vs impact (each normalized separately) for transparency."
+          },
+          {
+            "src": "",
+            "alt": "Corridors overlaid on desert tracts",
+            "caption": "06 \u2014 Top corridors over desert hatched tracts: fusion of priority segments and underserved areas."
+          },
+          {
+            "src": "",
+            "alt": "Table of top corridors",
+            "caption": "07 \u2014 Report-style table: stations, length, demand, R_eff, impact \u2014 matches CSV for communication."
           }
+        ],
+        "frameworks": [
+          "Python 3",
+          "GeoPandas, Shapely, pandas",
+          "NumPy, SciPy (linear algebra / pseudoinverse)",
+          "matplotlib (viz)",
+          "GTFS feeds (transit)",
+          "Census / ACS / LEHD inputs",
+          "Entry: scripts/run_la_analysis.py \u00b7 config: src/config.py \u00b7 core: src/la_analysis.py, src/transport_graph.py, src/viz_la.py"
         ]
       }
     },
@@ -69,8 +183,15 @@
         "Interactive chatbot for historical weather questions.",
         "Educational section on severe weather types and precautions."
       ],
-      "tech": ["ML", "NLP", "Weather APIs"],
-      "links": { "repo": "", "demo": "" },
+      "tech": [
+        "ML",
+        "NLP",
+        "Weather APIs"
+      ],
+      "links": {
+        "repo": "",
+        "demo": ""
+      },
       "detail": {
         "intro": [
           "TwistEd combines live hazard data with routing and an educational layer so users get alerts, safer paths, and context on what the risk actually means.",
@@ -78,7 +199,12 @@
         ],
         "stack": "Client requests weather alerts and route preferences; backend aggregates API feeds, scores edges on risk, and serves a small RAG-style chat index over curated historical snippets.",
         "methods": "Heuristic or learned route scoring under alerts; optional NLP intent routing for the chatbot; structured cards for the education module.",
-        "frameworks": ["Python or Node (your stack)", "Weather APIs", "Maps / directions API", "Vector store or BM25 for chat retrieval"],
+        "frameworks": [
+          "Python or Node (your stack)",
+          "Weather APIs",
+          "Maps / directions API",
+          "Vector store or BM25 for chat retrieval"
+        ],
         "visuals": [
           {
             "src": "",
@@ -91,19 +217,32 @@
       "slug": "courseplanner-ai",
       "title": "CoursePlanner AI Chatbot",
       "bullets": [
-        "Uses UCLA’s Developer API with LangChain and Pinecone to build optimized course plans from natural language.",
+        "Uses UCLA\u2019s Developer API with LangChain and Pinecone to build optimized course plans from natural language.",
         "Contextualizes top matches when justifying specific course recommendations."
       ],
-      "tech": ["LangChain", "Pinecone", "LLMs"],
-      "links": { "repo": "", "demo": "" },
+      "tech": [
+        "LangChain",
+        "Pinecone",
+        "LLMs"
+      ],
+      "links": {
+        "repo": "",
+        "demo": ""
+      },
       "detail": {
         "intro": [
           "Students describe goals and constraints in natural language; the system queries UCLA course data, embeds descriptions, and retrieves tight candidate sets before the LLM explains tradeoffs.",
           "Pinecone stores embedding-indexed course chunks so recommendations stay specific to UCLA offerings and update when the catalog changes."
         ],
         "stack": "LangChain orchestration (tools for catalog lookup), embedding model for course text, Pinecone for similarity, and a policy prompt that forces citations to retrieved rows.",
-        "methods": "Top-k retrieval with MMR or diversity, optional re-ranking, and structured JSON outputs for “plan” objects the UI can render.",
-        "frameworks": ["LangChain", "Pinecone", "OpenAI or open LLM API", "UCLA Developer API", "Python"],
+        "methods": "Top-k retrieval with MMR or diversity, optional re-ranking, and structured JSON outputs for \u201cplan\u201d objects the UI can render.",
+        "frameworks": [
+          "LangChain",
+          "Pinecone",
+          "OpenAI or open LLM API",
+          "UCLA Developer API",
+          "Python"
+        ],
         "visuals": [
           {
             "src": "",
@@ -118,19 +257,30 @@
       "bullets": [
         "Building an LLM that explains mathematical concepts in the context of another field through strong analogies."
       ],
-      "tech": ["LLMs", "Education", "Research"],
-      "links": { "repo": "", "demo": "" },
+      "tech": [
+        "LLMs",
+        "Education",
+        "Research"
+      ],
+      "links": {
+        "repo": "",
+        "demo": ""
+      },
       "detail": {
         "intro": [
           "The goal is pedagogy: map abstract math to a domain the learner already trusts (biology, economics, music, etc.) while preserving definitions and not overstating isomorphism.",
-          "Training / prompting strategy centers on analogy quality rubrics—faithfulness, clarity, and appropriate scope—rather than fluency alone."
+          "Training / prompting strategy centers on analogy quality rubrics\u2014faithfulness, clarity, and appropriate scope\u2014rather than fluency alone."
         ],
         "methods": "Instruction tuning or few-shot templates with critique steps; optional tool use for symbolic checks when available.",
-        "frameworks": ["PyTorch / HF Transformers", "PEFT / LoRA if fine-tuning", "Evaluation harness for analogy rubrics"],
+        "frameworks": [
+          "PyTorch / HF Transformers",
+          "PEFT / LoRA if fine-tuning",
+          "Evaluation harness for analogy rubrics"
+        ],
         "visuals": [
           {
             "src": "",
-            "caption": "Diagram: math concept → analogy → validation (placeholder)."
+            "caption": "Diagram: math concept \u2192 analogy \u2192 validation (placeholder)."
           }
         ]
       }
@@ -142,16 +292,29 @@
         "Models the vertical distribution of skyline clusters in Los Angeles using geospatial data and machine learning.",
         "Predicts potential locations for new high-rise clusters using density-based clustering and socioeconomic factors."
       ],
-      "tech": ["Geospatial", "Python", "Research"],
-      "links": { "repo": "", "demo": "" },
+      "tech": [
+        "Geospatial",
+        "Python",
+        "Research"
+      ],
+      "links": {
+        "repo": "",
+        "demo": ""
+      },
       "detail": {
         "intro": [
-          "Skyline “mass” is modeled as clustered vertical intensity surfaces over the LA basin, combining building height proxies with land use and economic covariates.",
+          "Skyline \u201cmass\u201d is modeled as clustered vertical intensity surfaces over the LA basin, combining building height proxies with land use and economic covariates.",
           "Downstream use is exploratory forecasting: where might the next wave of clustering emerge under similar pressures?"
         ],
         "stack": "Raster or hex-grid features from building footprints / height datasets, merged with ACS-style demographics; clustering and optional gradient-boosted models for ranking candidate cells.",
         "methods": "HDBSCAN / DBSCAN on engineered spatial features; calibration with held-out years or submarkets if data allows.",
-        "frameworks": ["Python", "GeoPandas", "scikit-learn", "XGBoost or similar", "matplotlib"],
+        "frameworks": [
+          "Python",
+          "GeoPandas",
+          "scikit-learn",
+          "XGBoost or similar",
+          "matplotlib"
+        ],
         "visuals": [
           {
             "src": "",
@@ -167,16 +330,28 @@
         "Detects and classifies dirty dishes in real-time using YOLO/DINO models through a camera placed in the kitchen.",
         "Uses timestamps to track the sequence of dishes and their states, triggering an alert when a dish has been left dirty for over 30 minutes."
       ],
-      "tech": ["Computer Vision", "Python", "YOLO/DINO"],
-      "links": { "repo": "", "demo": "" },
+      "tech": [
+        "Computer Vision",
+        "Python",
+        "YOLO/DINO"
+      ],
+      "links": {
+        "repo": "",
+        "demo": ""
+      },
       "detail": {
         "intro": [
           "A lightweight CV pipeline watches the sink area, classifies dish state (clean / dirty / ambiguous), and maintains a per-dish timeline from detections.",
-          "Alerts fire when dirty dwell time crosses a threshold—tunable for roommates or shared kitchens."
+          "Alerts fire when dirty dwell time crosses a threshold\u2014tunable for roommates or shared kitchens."
         ],
-        "stack": "Camera stream → frame sampling → detector (YOLO or DINO-based detector) → tracker or heuristic ID stitching → timer service → notification channel.",
+        "stack": "Camera stream \u2192 frame sampling \u2192 detector (YOLO or DINO-based detector) \u2192 tracker or heuristic ID stitching \u2192 timer service \u2192 notification channel.",
         "methods": "Data augmentation for kitchen lighting; confidence thresholds to reduce false alarms; optional temporal smoothing across frames.",
-        "frameworks": ["PyTorch", "Ultralytics YOLO or HF Transformers", "OpenCV", "Python"],
+        "frameworks": [
+          "PyTorch",
+          "Ultralytics YOLO or HF Transformers",
+          "OpenCV",
+          "Python"
+        ],
         "visuals": [
           {
             "src": "",

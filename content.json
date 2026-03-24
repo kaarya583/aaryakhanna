@@ -394,36 +394,376 @@
       "slug": "vertical-los-angeles",
       "title": "Vertical Los Angeles",
       "bullets": [
-        "Models the vertical distribution of skyline clusters in Los Angeles using geospatial data and machine learning.",
-        "Predicts potential locations for new high-rise clusters using density-based clustering and socioeconomic factors."
+        "Continuous height surface from footprints: variogram, universal kriging, and uncertainty-aware cluster potential on a metric grid.",
+        "Regression-kriging with covariate trend (HistGradientBoosting) plus residual kriging; LEHD workplace jobs overlaid on the same grid.",
+        "Descriptive geostatistics plus labor-market indices, not a structural urban model or causal identification stack."
       ],
       "tech": [
         "Geospatial",
+        "Geostatistics",
         "Python",
-        "Research"
+        "GSTools",
+        "LEHD"
       ],
       "links": {
-        "repo": "",
+        "repo": "https://github.com/kaarya583/verticalLA",
         "demo": ""
       },
       "detail": {
         "intro": [
-          "Skyline \u201cmass\u201d is modeled as clustered vertical intensity surfaces over the LA basin, combining building height proxies with land use and economic covariates.",
-          "Downstream use is exploratory forecasting: where might the next wave of clustering emerge under similar pressures?"
+          "Vertical LA models building height as a spatially continuous field over Los Angeles: empirical variograms, kriging on a regular grid, and derived indices for skyline-like potential. An optional regression-kriging stack adds zoning, transit, and census covariates, then layers LEHD workplace jobs to relate built-form potential to employment dynamics.",
+          "The work is built for portfolio-style technical communication: reproducible pipelines, explicit design choices, and maps that separate prediction from variance. It is not a land-use optimizer, structural urban model, or substitute for policy process."
         ],
-        "stack": "Raster or hex-grid features from building footprints / height datasets, merged with ACS-style demographics; clustering and optional gradient-boosted models for ranking candidate cells.",
-        "methods": "HDBSCAN / DBSCAN on engineered spatial features; calibration with held-out years or submarkets if data allows.",
-        "frameworks": [
-          "Python",
-          "GeoPandas",
-          "scikit-learn",
-          "XGBoost or similar",
-          "matplotlib"
-        ],
-        "visuals": [
+        "sections": [
           {
-            "src": "",
-            "caption": "3D or choropleth of vertical intensity by tract (add image when ready)."
+            "title": "Purpose",
+            "bullets": [
+              {
+                "segments": [
+                  {
+                    "text": "Estimate a smooth predicted height field "
+                  },
+                  {
+                    "latex": "\\hat{h}(x,y)",
+                    "display": false
+                  },
+                  {
+                    "text": " with geostatistical uncertainty, not only scattered footprints."
+                  }
+                ]
+              },
+              "Quantify spatial dependence (variogram), predict on a grid (kriging), and validate with cross-validation RMSE.",
+              {
+                "segments": [
+                  {
+                    "text": "Turn predictions plus variance into interpretable indices: expected skyline zones, cluster potential in "
+                  },
+                  {
+                    "latex": "[0,1]",
+                    "display": false
+                  },
+                  {
+                    "text": ", and (in the advanced path) tension between modeled potential and existing tall-building density."
+                  }
+                ]
+              },
+              "Optionally overlay LEHD job counts and simple per-cell trends to ask where job growth and level align with high cluster potential."
+            ]
+          },
+          {
+            "title": "Data & execution",
+            "bullets": [
+              "Building footprints with HEIGHT; centroids in EPSG:32611 (UTM 11N, meters) for meaningful distances and variogram lags.",
+              "LA County zoning (WKT), optional GTFS rail distances, optional Census tract covariates via cenpy.",
+              "LEHD WAC workplace jobs by block, crosswalked to coordinates and binned to the regression-kriging grid for spatiotemporal layers.",
+              "Large raw inputs are gitignored in the repo; tracked artifacts are code plus selected figures under `output/` on GitHub."
+            ]
+          },
+          {
+            "title": "Variogram & spatial dependence",
+            "bullets": [
+              {
+                "segments": [
+                  {
+                    "text": "Empirical semivariogram (GSTools), with lag caps and subsampling for large "
+                  },
+                  {
+                    "latex": "n",
+                    "display": false
+                  },
+                  {
+                    "text": "; multiple candidate models (Exponential, Spherical, Mat\u00e9rn) with nugget and range bounds."
+                  }
+                ]
+              },
+              "Best fit prefers Mat\u00e9rn when available; saves diagnostic comparison of empirical points to fitted curves."
+            ],
+            "paragraphs": [
+              "The variogram step grounds later kriging: it shows how height differences grow with distance and whether a single isotropic model is a reasonable first pass."
+            ],
+            "figures": [
+              {
+                "src": "https://raw.githubusercontent.com/kaarya583/verticalLA/main/output/variogram_fit.png",
+                "alt": "Variogram fit",
+                "caption": "Empirical semivariogram with fitted models. Informs range shape, nugget, and whether lag settings are sensible."
+              }
+            ]
+          },
+          {
+            "title": "Universal kriging surface",
+            "bullets": [
+              "Universal kriging with linear drift on a regular grid; stratified conditioning oversamples tall buildings when subsampling for runtime.",
+              {
+                "segments": [
+                  {
+                    "text": "Outputs predicted "
+                  },
+                  {
+                    "latex": "\\hat{h}",
+                    "display": false
+                  },
+                  {
+                    "text": " and kriging variance per cell: confident cores versus uncertain ribbons at data-sparse edges."
+                  }
+                ]
+              }
+            ],
+            "paragraphs": [
+              {
+                "segments": [
+                  {
+                    "text": "Read the two panels together: high "
+                  },
+                  {
+                    "latex": "\\hat{h}",
+                    "display": false
+                  },
+                  {
+                    "text": " where data support exists, and variance where the map extrapolates."
+                  }
+                ]
+              }
+            ],
+            "figures": [
+              {
+                "src": "https://raw.githubusercontent.com/kaarya583/verticalLA/main/output/kriging_surface.png",
+                "alt": "Kriging predicted height and variance",
+                "caption": "Predicted height surface (left) and prediction variance (right). Joint view of signal versus uncertainty."
+              }
+            ]
+          },
+          {
+            "title": "Regression-kriging & cluster emergence",
+            "bulletsFirst": false,
+            "paragraphs": [
+              {
+                "segments": [
+                  {
+                    "text": "Covariates include zoning joins, optional GTFS and Census features, and planar basis terms on the stacked point and grid set. A HistGradientBoostingRegressor fits the mean trend; residuals feed a new variogram and ordinary kriging of residuals. Grid prediction is "
+                  },
+                  {
+                    "latex": "\\hat{h}_{\\mathrm{RK}} = \\hat{h}_{\\mathrm{trend}} + \\hat{r}_{\\mathrm{krige}}",
+                    "display": false
+                  },
+                  {
+                    "text": ", with approximate variance from residual kriging."
+                  }
+                ]
+              }
+            ],
+            "equations": [
+              {
+                "tex": "\\mathrm{cp}_{\\mathrm{RK}} = \\frac{\\hat{h}_{\\mathrm{RK}}}{\\hat{h}_{\\mathrm{RK}} + \\sigma}",
+                "display": true
+              },
+              {
+                "tex": "\\mathrm{new\\_cluster\\_score} = \\mathrm{cp} \\cdot (1 - \\mathrm{td}_{\\mathrm{norm}})",
+                "display": true
+              }
+            ],
+            "bullets": [
+              {
+                "segments": [
+                  {
+                    "text": "Cluster potential (reg-kriging): "
+                  },
+                  {
+                    "latex": "\\mathrm{cp}_{\\mathrm{RK}}",
+                    "display": false
+                  },
+                  {
+                    "text": " down-weights uncertain peaks: the ratio shrinks potential where "
+                  },
+                  {
+                    "latex": "\\sigma",
+                    "display": false
+                  },
+                  {
+                    "text": " is large."
+                  }
+                ]
+              },
+              {
+                "segments": [
+                  {
+                    "latex": "\\mathrm{td}_{\\mathrm{norm}}",
+                    "display": false
+                  },
+                  {
+                    "text": " counts tall stock ("
+                  },
+                  {
+                    "latex": "\\geq 40\\ \\mathrm{m}",
+                    "display": false
+                  },
+                  {
+                    "text": ") within 1 km, normalized, so "
+                  },
+                  {
+                    "latex": "\\mathrm{new\\_cluster\\_score}",
+                    "display": false
+                  },
+                  {
+                    "text": " favors modeled potential where towers are not already dense (secondary or infill emphasis)."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "title": "LEHD jobs on the grid",
+            "bullets": [
+              {
+                "segments": [
+                  {
+                    "text": "Workplace jobs from LEHD WAC are summed into grid cells; maps use km offsets from the grid corner for readability. Two-year snapshot compares "
+                  },
+                  {
+                    "latex": "\\ln(1+\\mathrm{jobs})",
+                    "display": false
+                  },
+                  {
+                    "text": " fields to show where employment mass sits relative to the height story."
+                  }
+                ]
+              }
+            ],
+            "figures": [
+              {
+                "src": "https://raw.githubusercontent.com/kaarya583/verticalLA/main/output/spatiotemporal_lehd_jobs_2010_2013_km.png",
+                "alt": "LEHD jobs 2010 vs 2013",
+                "caption": "Log-scaled job intensity on the model grid for 2010 and 2013 (example years in the repo)."
+              }
+            ]
+          },
+          {
+            "title": "Employment trends",
+            "bullets": [
+              {
+                "segments": [
+                  {
+                    "text": "Per-cell OLS slope of "
+                  },
+                  {
+                    "latex": "\\ln(1+\\mathrm{jobs})",
+                    "display": false
+                  },
+                  {
+                    "text": " versus calendar year feeds a growth-oriented view of local labor-market momentum."
+                  }
+                ]
+              }
+            ],
+            "figures": [
+              {
+                "src": "https://raw.githubusercontent.com/kaarya583/verticalLA/main/output/spatiotemporal_log_jobs_trend_slope_km.png",
+                "alt": "Log jobs trend slope map",
+                "caption": "Where employment activity is trending up or down on the grid under a simple linear extrapolation."
+              }
+            ]
+          },
+          {
+            "title": "Joint future cluster score",
+            "bullets": [
+              {
+                "segments": [
+                  {
+                    "text": "Forecast "
+                  },
+                  {
+                    "latex": "\\ln(1+\\mathrm{jobs})",
+                    "display": false
+                  },
+                  {
+                    "text": " per cell to a target year; build growth and level indices (robust normalization), then combine as "
+                  },
+                  {
+                    "latex": "0.6\\,g + 0.4\\,\\ell",
+                    "display": false
+                  },
+                  {
+                    "text": " into a jobs future index (explicit weighting choice)."
+                  }
+                ]
+              },
+              {
+                "segments": [
+                  {
+                    "text": "Unregularized score: "
+                  },
+                  {
+                    "latex": "\\mathrm{future\\_score} = \\mathrm{cp}\\cdot \\mathrm{jobs\\_future\\_index}",
+                    "display": false
+                  },
+                  {
+                    "text": "."
+                  }
+                ]
+              }
+            ],
+            "figures": [
+              {
+                "src": "https://raw.githubusercontent.com/kaarya583/verticalLA/main/output/spatiotemporal_future_cluster_score_km.png",
+                "alt": "Future cluster score unregularized",
+                "caption": "Hotspots where modeled skyline potential and the jobs index align (illustrative forecast, not causal)."
+              }
+            ]
+          },
+          {
+            "title": "Distance-regularized score",
+            "bullets": [
+              {
+                "segments": [
+                  {
+                    "text": "Sparse seeds from high "
+                  },
+                  {
+                    "latex": "\\mathrm{cp}",
+                    "display": false
+                  },
+                  {
+                    "text": "; distance-based penalty "
+                  },
+                  {
+                    "latex": "m(d)=1-\\exp\\!\\left(-\\frac{d^2}{2\\ell^2}\\right)",
+                    "display": false
+                  },
+                  {
+                    "text": " down-weights proximity to strongest cores (avoids every cell being a seed)."
+                  }
+                ]
+              },
+              {
+                "segments": [
+                  {
+                    "text": "Regularized map: "
+                  },
+                  {
+                    "latex": "\\mathrm{future\\_score\\_reg} = \\mathrm{future\\_score}\\cdot m(d)",
+                    "display": false
+                  },
+                  {
+                    "text": ". Contrast with the unregularized map for core versus periphery emphasis."
+                  }
+                ]
+              }
+            ],
+            "figures": [
+              {
+                "src": "https://raw.githubusercontent.com/kaarya583/verticalLA/main/output/spatiotemporal_future_cluster_score_regularized_km.png",
+                "alt": "Regularized future cluster score",
+                "caption": "Same joint logic after geographic down-weighting near dominant modeled peaks. Interpret alongside seeds and normalization choices."
+              }
+            ],
+            "figureSize": "large"
+          },
+          {
+            "title": "Reading the outputs",
+            "bullets": [
+              "Exact CV RMSE, ranks, and top labels are run-specific and depend on your footprint extract and LEHD years.",
+              "Compare unregularized and regularized future maps: the latter emphasizes geography away from the strongest cluster-potential seeds (per percentiles and distance decay).",
+              "Area labels are nearest to fixed lon/lat anchors, not municipal boundaries; cross-check with map coordinates and trust-distance fields when present."
+            ]
           }
         ]
       }

@@ -984,6 +984,20 @@ section:not(:last-of-type) {
   margin-top: 0.25rem;
 }
 
+/* Side-by-side figures (e.g. compare two maps) */
+.project-section-figures.project-section-figures-two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem 1.25rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .project-section-figures.project-section-figures-two {
+    grid-template-columns: 1fr;
+  }
+}
+
 .project-figure-intext {
   margin: 0;
 }

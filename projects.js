@@ -84,7 +84,11 @@ function renderSectionFigures(s) {
   if (s.figure) list.push(s.figure);
   if (Array.isArray(s.figures)) list.push(...s.figures);
   if (!list.length) return "";
-  return `<div class="project-section-figures">${list.map(renderFigureCard).join("")}</div>`;
+  const layoutCls =
+    s.figuresLayout === "two-column" ? " project-section-figures-two" : "";
+  return `<div class="project-section-figures${layoutCls}">${list
+    .map(renderFigureCard)
+    .join("")}</div>`;
 }
 
 function renderSections(sections) {

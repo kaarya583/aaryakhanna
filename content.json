@@ -25,7 +25,7 @@
       "highlights": [
         "Clustered questions from 15,000+ large-scale text documents into groups of semantic similarity, leveraging automated pronoun disambiguation.",
         "Built a hybrid pipeline: initial embedding screenings to filter unlikely matches, then a cross-attention model with the right context window to maximize cluster assignment quality.",
-        "Automated cluster quality evaluation by comparing each vector\u2019s distance to its cluster centroid\u2014reverse-engineering a \u201ccluster theme\u201d\u2014then used it as a baseline for an LLM to grade compactness with contextual reasoning."
+        "Automated cluster quality evaluation by comparing each vector\u2019s distance to its cluster centroid, reverse-engineering a \u201ccluster theme\u201d, then used it as a baseline for an LLM to grade compactness with contextual reasoning."
       ],
       "software": "Python (PyTorch, Pandas, NumPy, scikit-learn, matplotlib, NLTK, Hugging Face, SBERT), Linux",
       "methods": "K-means / HDBSCAN / DBSCAN clustering, logistic/linear regression, LLMs, API text embeddings, dimension reduction (UMAP/PCA), silhouette scores"
@@ -282,44 +282,6 @@
       }
     },
     {
-      "slug": "twisted",
-      "title": "TwistEd",
-      "bullets": [
-        "Real-time weather alerts and safest recommended travel routes.",
-        "Interactive chatbot for historical weather questions.",
-        "Educational section on severe weather types and precautions."
-      ],
-      "tech": [
-        "ML",
-        "NLP",
-        "Weather APIs"
-      ],
-      "links": {
-        "repo": "",
-        "demo": ""
-      },
-      "detail": {
-        "intro": [
-          "TwistEd combines live hazard data with routing and an educational layer so users get alerts, safer paths, and context on what the risk actually means.",
-          "The assistant path uses retrieval over historical weather records so answers stay grounded in real events rather than generic text."
-        ],
-        "stack": "Client requests weather alerts and route preferences; backend aggregates API feeds, scores edges on risk, and serves a small RAG-style chat index over curated historical snippets.",
-        "methods": "Heuristic or learned route scoring under alerts; optional NLP intent routing for the chatbot; structured cards for the education module.",
-        "frameworks": [
-          "Python or Node (your stack)",
-          "Weather APIs",
-          "Maps / directions API",
-          "Vector store or BM25 for chat retrieval"
-        ],
-        "visuals": [
-          {
-            "src": "",
-            "caption": "UI mock or alert + route screenshot (add file under /images/)."
-          }
-        ]
-      }
-    },
-    {
       "slug": "courseplanner-ai",
       "title": "CoursePlanner AI Chatbot",
       "bullets": [
@@ -375,7 +337,7 @@
       "detail": {
         "intro": [
           "The goal is pedagogy: map abstract math to a domain the learner already trusts (biology, economics, music, etc.) while preserving definitions and not overstating isomorphism.",
-          "Training / prompting strategy centers on analogy quality rubrics\u2014faithfulness, clarity, and appropriate scope\u2014rather than fluency alone."
+          "Training / prompting strategy centers on analogy quality rubrics (faithfulness, clarity, and appropriate scope) rather than fluency alone."
         ],
         "methods": "Instruction tuning or few-shot templates with critique steps; optional tool use for symbolic checks when available.",
         "frameworks": [
@@ -412,7 +374,7 @@
       },
       "detail": {
         "intro": [
-          "Vertical LA explores where Los Angeles might grow taller, using building footprints and layers like zoning, transit, and jobs. It is a descriptive, map-first story: geostatistics, a simple machine-learning trend, and a bit of urban intuition — not a land-use simulator or a causal claim about what drives development.",
+          "Vertical LA explores where Los Angeles might grow taller, using building footprints and layers like zoning, transit, and jobs. It is a descriptive, map-first story: geostatistics, a simple machine-learning trend, and a bit of urban intuition. It is not a land-use simulator or a causal claim about what drives development.",
           "The repo is written for people who want to see how the pieces fit: data, models, and readable maps you can argue with."
         ],
         "sections": [
@@ -509,22 +471,22 @@
             ]
           },
           {
-            "title": "Where skyline potential meets future jobs",
+            "title": "Spatial predictions on the grid",
             "bullets": [
-              "The score blends modeled skyline potential with a jobs outlook for each cell (growth and level rolled into one index after normalization).",
-              "The left map is the direct blend: hotspots where both signals are strong.",
-              "The right map adds a soft penalty: the strongest modeled peaks are treated as \u201calready found\u201d centers. Places that still score well when you step away from those peaks rise up — a way to surface secondary or emerging areas instead of repeating the same core everywhere."
+              "Each map cell carries one combined score. It folds together the skyline-style potential from the height model (prediction and uncertainty from earlier steps) with a single auxiliary outlook variable on the same grid, after normalization so the surface is easy to compare across the city.",
+              "The left panel is the raw combined score: where the model says both built-form potential and the outlook line up most strongly.",
+              "The right panel uses regularization. The strongest modeled peaks are treated as established centers, and a smooth penalty shrinks the score for cells that sit right next to those centers. The penalty eases with distance, so places farther from those peaks can still rank highly. That helps secondary or emerging areas show up instead of painting the same core over and over."
             ],
             "figures": [
               {
                 "src": "https://raw.githubusercontent.com/kaarya583/verticalLA/main/output/spatiotemporal_future_cluster_score_km.png",
-                "alt": "Joint future cluster score (unregularized)",
-                "caption": "Unregularized: combined skyline potential and jobs outlook (illustrative, not causal)."
+                "alt": "Combined score map (unregularized)",
+                "caption": "Unregularized combined score per cell (illustrative, not causal)."
               },
               {
                 "src": "https://raw.githubusercontent.com/kaarya583/verticalLA/main/output/spatiotemporal_future_cluster_score_regularized_km.png",
-                "alt": "Joint future cluster score (regularized)",
-                "caption": "After down-weighting areas right next to the strongest peaks: emphasis on places that still score well farther out."
+                "alt": "Combined score map (regularized)",
+                "caption": "Same score after the distance-based penalty near dominant peaks: emphasis on cells that still look strong farther out."
               }
             ],
             "figuresLayout": "two-column"
@@ -532,9 +494,9 @@
           {
             "title": "Reading the outputs",
             "bullets": [
-              "Exact fit metrics and rank lists depend on your footprint extract and LEHD years — treat numbers as tied to a given run.",
-              "Compare the two future maps side by side: the left is the direct blend; the right is when you dial down credit for standing on top of existing hot spots.",
-              "Named place labels are nearest-neighbor anchors to sample points, not official boundaries — check coordinates if you quote a location."
+              "Exact fit metrics and rank lists depend on your footprint extract and LEHD years, so treat numbers as tied to a given run.",
+              "Compare the two prediction maps side by side: the left is the direct combined score; the right applies the regularization penalty near the strongest peaks.",
+              "Named place labels are nearest-neighbor anchors to sample points, not official boundaries. Check coordinates if you quote a location."
             ]
           }
         ]
@@ -559,7 +521,7 @@
       "detail": {
         "intro": [
           "A lightweight CV pipeline watches the sink area, classifies dish state (clean / dirty / ambiguous), and maintains a per-dish timeline from detections.",
-          "Alerts fire when dirty dwell time crosses a threshold\u2014tunable for roommates or shared kitchens."
+          "Alerts fire when dirty dwell time crosses a threshold (tunable for roommates or shared kitchens)."
         ],
         "stack": "Camera stream \u2192 frame sampling \u2192 detector (YOLO or DINO-based detector) \u2192 tracker or heuristic ID stitching \u2192 timer service \u2192 notification channel.",
         "methods": "Data augmentation for kitchen lighting; confidence thresholds to reduce false alarms; optional temporal smoothing across frames.",
@@ -573,6 +535,44 @@
           {
             "src": "",
             "caption": "Bounding boxes on sink scene + timer overlay (screenshot)."
+          }
+        ]
+      }
+    },
+    {
+      "slug": "twisted",
+      "title": "TwistEd",
+      "bullets": [
+        "Real-time weather alerts and safest recommended travel routes.",
+        "Interactive chatbot for historical weather questions.",
+        "Educational section on severe weather types and precautions."
+      ],
+      "tech": [
+        "ML",
+        "NLP",
+        "Weather APIs"
+      ],
+      "links": {
+        "repo": "",
+        "demo": ""
+      },
+      "detail": {
+        "intro": [
+          "TwistEd combines live hazard data with routing and an educational layer so users get alerts, safer paths, and context on what the risk actually means.",
+          "The assistant path uses retrieval over historical weather records so answers stay grounded in real events rather than generic text."
+        ],
+        "stack": "Client requests weather alerts and route preferences; backend aggregates API feeds, scores edges on risk, and serves a small RAG-style chat index over curated historical snippets.",
+        "methods": "Heuristic or learned route scoring under alerts; optional NLP intent routing for the chatbot; structured cards for the education module.",
+        "frameworks": [
+          "Python or Node (your stack)",
+          "Weather APIs",
+          "Maps / directions API",
+          "Vector store or BM25 for chat retrieval"
+        ],
+        "visuals": [
+          {
+            "src": "",
+            "caption": "UI mock or alert + route screenshot (add file under /images/)."
           }
         ]
       }

@@ -369,10 +369,15 @@
       "slug": "analogy-llm",
       "title": "Analogy LLM",
       "bullets": [
-        "Building an LLM that explains mathematical concepts in the context of another field through strong analogies."
+        "Interdisciplinary teaching assistant that explains math ideas through analogies from other domains.",
+        "Generation model proposes multiple analogies; a learned reward model scores quality; PPO nudges outputs toward clearer and more faithful analogies.",
+        "RLAIF-oriented workflow designed for educational usefulness, not just fluent wording."
       ],
       "tech": [
         "LLMs",
+        "RLAIF / PPO",
+        "Mistral-7B",
+        "BERT",
         "Education",
         "Research"
       ],
@@ -382,19 +387,59 @@
       },
       "detail": {
         "intro": [
-          "The goal is pedagogy: map abstract math to a domain the learner already trusts (biology, economics, music, etc.) while preserving definitions and not overstating isomorphism.",
-          "Training / prompting strategy centers on analogy quality rubrics (faithfulness, clarity, and appropriate scope) rather than fluency alone."
+          "Analogy LLM asks a simple question: can we explain hard math by connecting it to fields people already understand. The project is motivated by interdisciplinary breakthroughs, where methods from one domain unlock progress in another.",
+          "In practice, the system generates several candidate analogies, scores them for quality, and improves over time with reinforcement learning so the final answer is both understandable and faithful to the original concept."
         ],
-        "methods": "Instruction tuning or few-shot templates with critique steps; optional tool use for symbolic checks when available.",
-        "frameworks": [
-          "PyTorch / HF Transformers",
-          "PEFT / LoRA if fine-tuning",
-          "Evaluation harness for analogy rubrics"
-        ],
-        "visuals": [
+        "sections": [
           {
-            "src": "",
-            "caption": "Diagram: math concept \u2192 analogy \u2192 validation (placeholder)."
+            "title": "Project goal",
+            "bullets": [
+              "Input: a math topic plus a target domain (for example chemistry, biology, or economics).",
+              "Output: an analogy that keeps the core math idea intact while translating it into familiar language.",
+              "Success criterion: the analogy should improve comprehension without introducing major conceptual drift."
+            ]
+          },
+          {
+            "title": "System at a high level",
+            "bullets": [
+              "Generation model: Mistral-7B creates multiple candidate analogies per prompt.",
+              "Reward model: BERT-based scorer estimates which candidate is clearer, more relevant, and more accurate.",
+              "Selection loop: choose the best candidate, then use that signal to improve future generation behavior."
+            ]
+          },
+          {
+            "title": "RLAIF in this project",
+            "bullets": [
+              "RLAIF stands for Reinforcement Learning from AI Feedback: feedback comes from a model-based evaluator rather than only human labels.",
+              "Here, BERT acts as the evaluator and produces a preference signal over generated analogies.",
+              "PPO then updates the generator so higher-scoring analogy styles become more likely over training rollouts.",
+              "The practical reason for this setup is scale: it is faster to iterate than fully manual ranking while still enforcing a quality target beyond plain fluency."
+            ]
+          },
+          {
+            "title": "Current status",
+            "bullets": [
+              "Baseline generation already produces multiple useful analogies for many prompts.",
+              "Reward-model training and PPO rollouts are the main bottleneck because evaluating several candidates per prompt is compute-heavy.",
+              "Near-term focus is stabilizing training and validating that reward gains transfer to better student-facing explanations."
+            ]
+          },
+          {
+            "title": "Example outputs",
+            "examples": [
+              {
+                "title": "Ex: eigenvectors through protein folding intuition",
+                "text": "Prompt: Explain eigenvectors using a chemistry or biology analogy.\n\nAssistant:\nThink of a protein folding process where most perturbations change the shape unpredictably, but a few privileged directions in configuration space preserve the folding pattern and only scale its intensity. Eigenvectors are those privileged directions for a linear transformation: the operation stretches or shrinks them but does not rotate them into a different direction."
+              },
+              {
+                "title": "Ex: gradient descent with hiking",
+                "text": "Prompt: Explain gradient descent for a beginner.\n\nAssistant:\nImagine hiking in fog and trying to reach the valley floor. At each step you feel the local slope and move in the steepest downhill direction. Repeating that local rule gets you to a low point even without seeing the full map. Gradient descent does the same with a loss surface: it follows local slope information to reduce error step by step."
+              },
+              {
+                "title": "Ex: why RLAIF changes output style",
+                "text": "Prompt: Why use RLAIF for analogies?\n\nAssistant:\nA base model can produce fluent analogies, but some are shallow or slightly misleading. In RLAIF, a reward model scores candidates for clarity and faithfulness, then PPO increases the chance of high-scoring patterns. Over time, the model shifts from \"sounds good\" analogies to analogies that are more consistently educational."
+              }
+            ]
           }
         ]
       }

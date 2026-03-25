@@ -524,29 +524,47 @@
       },
       "detail": {
         "intro": [
-          "Clean Your Dishes is a small batch analysis tool for kitchen videos centered on the sink. I built it to turn unstructured footage into a clear visual answer: which dish-like objects appear in frame, and whether each one sits mostly inside the basin or outside it. The output is an interactive viewer, not a batch export, because the point is to inspect behavior on real clips quickly.",
-          "The scope is deliberately narrow. It does not classify clean versus dirty or track long-term state; it combines open-vocabulary detection, instance segmentation, and plain geometry so that \"in the sink\" is a transparent rule you can calibrate. That keeps the project honest about what it claims and practical to run on a laptop with off-the-shelf models."
+          "Clean Your Dishes is a batch tool for kitchen videos around the sink.",
+          "The question it answers is simple: what looks like a dish, and is it mostly in the basin or not?",
+          "You step through footage in a viewer with overlays and lists, not a pile of anonymous outputs.",
+          "It skips clean versus dirty scoring. Detection, masks, and one geometric rule keep the story easy to read and to tune."
         ],
         "sections": [
           {
-            "title": "What it accomplishes",
-            "paragraphs": [
-              "Given recorded MP4s and a one-time definition of the sink region, the program produces per-frame style overlays: candidate objects from a text prompt (cups, bowls, plates, and similar), a tight mask for each object, and a binary split into in-sink versus outside based on overlap with the basin. The accomplishment is a full loop from files on disk to a single window you can step through, with lists in the margin summarizing what landed where.",
-              "Technically the flow is text-conditioned boxes, then segment-anything style masks inside those boxes, then a ratio of mask area inside the sink polygon to total mask area. Above a threshold counts as in sink; otherwise outside. An OpenCV UI draws the crop around the sink, overlays masks and boxes in two colors, traces the sink outline, and refreshes labels as the video plays."
+            "title": "From clips to labels",
+            "bullets": [
+              "Load MP4s and define the sink once, from a saved polygon or a default rectangle.",
+              "Write a short text list of dish words (cups, bowls, plates). The model uses that list to propose boxes.",
+              "Each box gets a proper outline mask, not just a rectangle.",
+              "Compare each mask to the sink. The score is how much of the dish lies inside the basin.",
+              "Pass a cutoff and you get two buckets: in sink and outside.",
+              "OpenCV shows the crop, colored masks, the sink outline, and side lists that update as you play the video."
             ]
           },
           {
-            "title": "Design choices and practicality",
-            "paragraphs": [
-              "The overlap rule uses the fraction of each object that lies inside the sink, not a symmetric overlap between two regions. That matches an intuitive \"mostly in the basin\" judgment when objects are oddly shaped or partly occluded, and it exposes one knob (minimum fraction) instead of a black box score.",
-              "Detection and segmentation only run every Nth frame; intermediate frames reuse the last result so playback stays smooth on consumer hardware. Frames are resized consistently, the pipeline crops to a padded window around the sink so models focus on the relevant pixels, and duplicate boxes are merged before masks are computed. Together these choices make the tool usable on long clips without pretending every frame needs full inference.",
-              "Runs are configurable: paths to videos and weights, a dot-separated prompt string, confidence and matching thresholds, optional calibration to save the sink polygon, and CPU versus GPU. Videos can be selected by name, filtered by date from filenames or timestamps, or chosen interactively from a folder, which fits both one-off demos and repeated review of a camera dump."
+            "title": "Why it is built this way",
+            "bullets": [
+              "The overlap rule asks what fraction of the dish sits in the sink. That matches \"mostly in\" for odd shapes without a black box metric.",
+              "Heavy steps run only every few frames. The UI reuses the last result in between so playback stays smooth on a laptop.",
+              "Work happens on a crop around the sink with padding, so the models spend effort where it matters.",
+              "Duplicate boxes get merged before masks. Bounds stay clipped so nothing drifts off the image."
             ]
           },
           {
-            "title": "Implementation note",
-            "paragraphs": [
-              "The GroundingDINO stack expects an older Hugging Face Transformers API for BERT. I added a small monkey patch at startup so current library versions still satisfy those calls without changing the dish or sink logic. It is glue for reproducibility, not part of the modeling story itself."
+            "title": "What you can configure",
+            "bullets": [
+              "Paths to videos, model weights, and optional JSON for the sink shape.",
+              "Prompt text, confidence thresholds, and how aggressively to merge overlapping boxes.",
+              "CPU or GPU. Models load once per run.",
+              "Pick files by name, filter by date from filenames or file times, or browse the folder interactively.",
+              "Calibration mode saves a new sink outline and exits when you are done."
+            ]
+          },
+          {
+            "title": "Compatibility",
+            "bullets": [
+              "GroundingDINO still expects an older Transformers API for BERT. A small startup patch bridges that gap.",
+              "The patch only fixes library versions. It does not change how dishes or the sink are defined."
             ]
           }
         ]

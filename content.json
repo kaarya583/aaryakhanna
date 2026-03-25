@@ -304,15 +304,14 @@
       "detail": {
         "intro": [
           "BruinPlanner helps students explore UCLA courses without clicking through the whole catalog. You describe your major and what you enjoy, and the app pulls real course descriptions that are semantically close to your words, then an LLM turns those chunks into a short, structured answer.",
-          "The stack is classic RAG: embeddings and a vector index for retrieval, LangChain to wire tools and prompts, and Streamlit for a simple interactive surface. The examples below are illustrative transcripts, not live screenshots."
+          "BruinPlanner uses a straightforward RAG pipeline: embeddings plus a vector index to retrieve relevant catalog content, LangChain to organize prompts and flow, and Streamlit for a clean interactive interface."
         ],
         "sections": [
           {
             "title": "What it does",
             "bullets": [
               "Input: your major (for degree context) and a free-text line about interests, such as coding, economics, or neural networks.",
-              "Output: course and GE suggestions that line up with both the wording you used and the requirements framing we encode from UCLA data.",
-              "Goal: make it easier to discover classes you will actually want to take, instead of guessing from course titles alone."
+              "Output: course and GE suggestions that line up with both the wording you used and the requirements framing we encode from UCLA data."
             ]
           },
           {
@@ -327,23 +326,14 @@
             "title": "Match scores",
             "bullets": [
               "Each course description and your interest string are embedded into the same vector space using a trained embedding model.",
-              "We rank candidates with cosine similarity (think: angle between two arrows in high-dimensional space). Higher similarity shows up in the UI as a higher match percentage.",
+              "We rank candidates with cosine similarity. Higher similarity shows up in the UI as a higher match percentage.",
               "Pinecone holds the vectors so lookups stay fast as the catalog grows."
-            ]
-          },
-          {
-            "title": "Streamlit interface",
-            "bullets": [
-              "Streamlit gave us a working web UI in Python without building a separate front end.",
-              "The page shows match percentages next to suggestions, formats the model output for easy scanning, and exposes a chat box for follow-ups in the same session.",
-              "Today the demo runs locally rather than on a shared cloud host; a natural next step would be deployment with a proper database behind it."
             ]
           },
           {
             "title": "Reasoning style prompts",
             "bullets": [
-              "Chain-of-thought style prompting asks the model to spell out a few internal steps before the user-facing answer (for example: parse interests, list retrieved titles, then recommend).",
-              "We use that pattern in two places: one pipeline that cleans and formats scraped catalog fields, and another that matches courses to the user and applies formatting rules.",
+              "Chain-of-thought style prompting asks the model to spell out a few internal steps before the user-facing answer (ex: parse interests, list retrieved titles, then recommend).",
               "The visible answer stays short; the intermediate steps mainly improve consistency and reduce shallow replies."
             ]
           },
@@ -351,16 +341,7 @@
             "title": "Chat memory",
             "bullets": [
               "The chatbot stores prior user and assistant messages in Streamlit session state.",
-              "Each new question can call the API with that history so follow-ups like \"add a quantitative GE\" build on what you already asked.",
-              "Memory lasts for the open session only, which keeps behavior predictable for a class demo."
-            ]
-          },
-          {
-            "title": "Roadmap",
-            "bullets": [
-              "Broaden coverage beyond a single major slice of the catalog.",
-              "Deepen chat skills (clarifying questions, plan edits).",
-              "Enrich GE coverage and optional signals such as grade distributions from BruinWalk-style data."
+              "Each new question can call the API with that history so follow-ups like \"add a quantitative GE\" build on what you already asked."
             ]
           },
           {

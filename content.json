@@ -38,7 +38,7 @@
   "projects": [
     {
       "slug": "transit-deserts",
-      "title": "Transit Deserts: Who the Los Angeles Metro System Leaves Behind",
+      "title": "Transit Deserts",
       "bullets": [
         "LA County screening: job accessibility, desert mapping, rail corridor ranking.",
         "Census + LEHD + GTFS; Laplacian pseudoinverse and effective resistance.",

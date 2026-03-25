@@ -387,8 +387,7 @@
       },
       "detail": {
         "intro": [
-          "Analogy LLM asks a simple question: can we explain hard math by connecting it to fields people already understand. The project is motivated by interdisciplinary breakthroughs, where methods from one domain unlock progress in another.",
-          "In practice, the system generates several candidate analogies, scores them for quality, and improves over time with reinforcement learning so the final answer is both understandable and faithful to the original concept."
+          "Can we explain hard math by connecting it to fields people already understand. That question drives this project. Inspired by interdisciplinary breakthroughs, the system generates several candidate analogies, scores them for quality, and improves over time with reinforcement learning so final answers are easier to understand while staying faithful to the original concept."
         ],
         "sections": [
           {
@@ -412,16 +411,9 @@
             "bullets": [
               "RLAIF stands for Reinforcement Learning from AI Feedback: feedback comes from a model-based evaluator rather than only human labels.",
               "Here, BERT acts as the evaluator and produces a preference signal over generated analogies.",
-              "PPO then updates the generator so higher-scoring analogy styles become more likely over training rollouts.",
-              "The practical reason for this setup is scale: it is faster to iterate than fully manual ranking while still enforcing a quality target beyond plain fluency."
-            ]
-          },
-          {
-            "title": "Current status",
-            "bullets": [
-              "Baseline generation already produces multiple useful analogies for many prompts.",
-              "Reward-model training and PPO rollouts are the main bottleneck because evaluating several candidates per prompt is compute-heavy.",
-              "Near-term focus is stabilizing training and validating that reward gains transfer to better student-facing explanations."
+              "PPO (Proximal Policy Optimization) is the reinforcement-learning update method we use to nudge the generator toward higher-scoring analogy styles without destabilizing training.",
+              "We chose AI feedback because it scales much faster than fully manual ranking while still letting us enforce a strict quality rubric.",
+              "To avoid AI-to-AI drift, we constrain the evaluator with explicit prompting at the start: score faithfulness to the source concept first, then clarity, then domain relevance, and penalize confident but unsupported analogies."
             ]
           },
           {

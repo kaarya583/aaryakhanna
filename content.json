@@ -506,13 +506,17 @@
       "slug": "clean-your-dishes",
       "title": "Clean Your Dishes",
       "bullets": [
-        "Detects and classifies dirty dishes in real-time using YOLO/DINO models through a camera placed in the kitchen.",
-        "Uses timestamps to track the sequence of dishes and their states, triggering an alert when a dish has been left dirty for over 30 minutes."
+        "End-to-end tool on kitchen MP4s: text-guided detection, per-object masks, and geometric labels for in-sink versus outside a user-defined basin.",
+        "Interactive OpenCV viewer with masks, boxes, sink outline, and categorized lists so results are easy to scan.",
+        "Practical runtime choices: sink-centered crop, sparse inference on frames, and configurable thresholds for real household footage."
       ],
       "tech": [
         "Computer Vision",
         "Python",
-        "YOLO/DINO"
+        "PyTorch",
+        "OpenCV",
+        "GroundingDINO",
+        "SAM"
       ],
       "links": {
         "repo": "",
@@ -520,21 +524,30 @@
       },
       "detail": {
         "intro": [
-          "A lightweight CV pipeline watches the sink area, classifies dish state (clean / dirty / ambiguous), and maintains a per-dish timeline from detections.",
-          "Alerts fire when dirty dwell time crosses a threshold (tunable for roommates or shared kitchens)."
+          "Clean Your Dishes is a small batch analysis tool for kitchen videos centered on the sink. I built it to turn unstructured footage into a clear visual answer: which dish-like objects appear in frame, and whether each one sits mostly inside the basin or outside it. The output is an interactive viewer, not a batch export, because the point is to inspect behavior on real clips quickly.",
+          "The scope is deliberately narrow. It does not classify clean versus dirty or track long-term state; it combines open-vocabulary detection, instance segmentation, and plain geometry so that \"in the sink\" is a transparent rule you can calibrate. That keeps the project honest about what it claims and practical to run on a laptop with off-the-shelf models."
         ],
-        "stack": "Camera stream \u2192 frame sampling \u2192 detector (YOLO or DINO-based detector) \u2192 tracker or heuristic ID stitching \u2192 timer service \u2192 notification channel.",
-        "methods": "Data augmentation for kitchen lighting; confidence thresholds to reduce false alarms; optional temporal smoothing across frames.",
-        "frameworks": [
-          "PyTorch",
-          "Ultralytics YOLO or HF Transformers",
-          "OpenCV",
-          "Python"
-        ],
-        "visuals": [
+        "sections": [
           {
-            "src": "",
-            "caption": "Bounding boxes on sink scene + timer overlay (screenshot)."
+            "title": "What it accomplishes",
+            "paragraphs": [
+              "Given recorded MP4s and a one-time definition of the sink region, the program produces per-frame style overlays: candidate objects from a text prompt (cups, bowls, plates, and similar), a tight mask for each object, and a binary split into in-sink versus outside based on overlap with the basin. The accomplishment is a full loop from files on disk to a single window you can step through, with lists in the margin summarizing what landed where.",
+              "Technically the flow is text-conditioned boxes, then segment-anything style masks inside those boxes, then a ratio of mask area inside the sink polygon to total mask area. Above a threshold counts as in sink; otherwise outside. An OpenCV UI draws the crop around the sink, overlays masks and boxes in two colors, traces the sink outline, and refreshes labels as the video plays."
+            ]
+          },
+          {
+            "title": "Design choices and practicality",
+            "paragraphs": [
+              "The overlap rule uses the fraction of each object that lies inside the sink, not a symmetric overlap between two regions. That matches an intuitive \"mostly in the basin\" judgment when objects are oddly shaped or partly occluded, and it exposes one knob (minimum fraction) instead of a black box score.",
+              "Detection and segmentation only run every Nth frame; intermediate frames reuse the last result so playback stays smooth on consumer hardware. Frames are resized consistently, the pipeline crops to a padded window around the sink so models focus on the relevant pixels, and duplicate boxes are merged before masks are computed. Together these choices make the tool usable on long clips without pretending every frame needs full inference.",
+              "Runs are configurable: paths to videos and weights, a dot-separated prompt string, confidence and matching thresholds, optional calibration to save the sink polygon, and CPU versus GPU. Videos can be selected by name, filtered by date from filenames or timestamps, or chosen interactively from a folder, which fits both one-off demos and repeated review of a camera dump."
+            ]
+          },
+          {
+            "title": "Implementation note",
+            "paragraphs": [
+              "The GroundingDINO stack expects an older Hugging Face Transformers API for BERT. I added a small monkey patch at startup so current library versions still satisfy those calls without changing the dish or sink logic. It is glue for reproducibility, not part of the modeling story itself."
+            ]
           }
         ]
       }

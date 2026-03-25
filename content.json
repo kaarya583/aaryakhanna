@@ -283,15 +283,19 @@
     },
     {
       "slug": "courseplanner-ai",
-      "title": "CoursePlanner AI Chatbot",
+      "title": "BruinPlanner",
       "bullets": [
-        "Uses UCLA\u2019s Developer API with LangChain and Pinecone to build optimized course plans from natural language.",
-        "Contextualizes top matches when justifying specific course recommendations."
+        "UCLA course assistant built with retrieval-augmented generation: catalog text in, ranked courses and GE ideas out.",
+        "Streamlit UI shows match scores, readable answers, and a chat that remembers the thread for one session.",
+        "DataRes team project (Winter quarter) with Derek Shi, Yulia Anashkina, Rosie Chen, and me."
       ],
       "tech": [
+        "Python",
+        "Streamlit",
         "LangChain",
         "Pinecone",
-        "LLMs"
+        "OpenAI API",
+        "UCLA Developer API"
       ],
       "links": {
         "repo": "",
@@ -299,22 +303,83 @@
       },
       "detail": {
         "intro": [
-          "Students describe goals and constraints in natural language; the system queries UCLA course data, embeds descriptions, and retrieves tight candidate sets before the LLM explains tradeoffs.",
-          "Pinecone stores embedding-indexed course chunks so recommendations stay specific to UCLA offerings and update when the catalog changes."
+          "BruinPlanner helps students explore UCLA courses without clicking through the whole catalog. You describe your major and what you enjoy, and the app pulls real course descriptions that are semantically close to your words, then an LLM turns those chunks into a short, structured answer.",
+          "The stack is classic RAG: embeddings and a vector index for retrieval, LangChain to wire tools and prompts, and Streamlit for a simple interactive surface. The examples below are illustrative transcripts, not live screenshots."
         ],
-        "stack": "LangChain orchestration (tools for catalog lookup), embedding model for course text, Pinecone for similarity, and a policy prompt that forces citations to retrieved rows.",
-        "methods": "Top-k retrieval with MMR or diversity, optional re-ranking, and structured JSON outputs for \u201cplan\u201d objects the UI can render.",
-        "frameworks": [
-          "LangChain",
-          "Pinecone",
-          "OpenAI or open LLM API",
-          "UCLA Developer API",
-          "Python"
-        ],
-        "visuals": [
+        "sections": [
           {
-            "src": "",
-            "caption": "Example chat turn with retrieved course cards (screenshot)."
+            "title": "What it does",
+            "bullets": [
+              "Input: your major (for degree context) and a free-text line about interests, such as coding, economics, or neural networks.",
+              "Output: course and GE suggestions that line up with both the wording you used and the requirements framing we encode from UCLA data.",
+              "Goal: make it easier to discover classes you will actually want to take, instead of guessing from course titles alone."
+            ]
+          },
+          {
+            "title": "Retrieval augmented generation in one minute",
+            "bullets": [
+              "Retrieval: turn the catalog into searchable chunks, embed your question, and fetch the pieces whose vectors sit closest to yours.",
+              "Augmentation: hand those chunks to the model as context so it cannot invent sections that do not exist in the retrieved text.",
+              "Generation: the model writes the final reply (bullets, short explanations) using only that grounded material, plus light formatting rules we add in the prompt."
+            ]
+          },
+          {
+            "title": "Match scores",
+            "bullets": [
+              "Each course description and your interest string are embedded into the same vector space using a trained embedding model.",
+              "We rank candidates with cosine similarity (think: angle between two arrows in high-dimensional space). Higher similarity shows up in the UI as a higher match percentage.",
+              "Pinecone holds the vectors so lookups stay fast as the catalog grows."
+            ]
+          },
+          {
+            "title": "Streamlit interface",
+            "bullets": [
+              "Streamlit gave us a working web UI in Python without building a separate front end.",
+              "The page shows match percentages next to suggestions, formats the model output for easy scanning, and exposes a chat box for follow-ups in the same session.",
+              "Today the demo runs locally rather than on a shared cloud host; a natural next step would be deployment with a proper database behind it."
+            ]
+          },
+          {
+            "title": "Reasoning style prompts",
+            "bullets": [
+              "Chain-of-thought style prompting asks the model to spell out a few internal steps before the user-facing answer (for example: parse interests, list retrieved titles, then recommend).",
+              "We use that pattern in two places: one pipeline that cleans and formats scraped catalog fields, and another that matches courses to the user and applies formatting rules.",
+              "The visible answer stays short; the intermediate steps mainly improve consistency and reduce shallow replies."
+            ]
+          },
+          {
+            "title": "Chat memory",
+            "bullets": [
+              "The chatbot stores prior user and assistant messages in Streamlit session state.",
+              "Each new question can call the API with that history so follow-ups like \"add a quantitative GE\" build on what you already asked.",
+              "Memory lasts for the open session only, which keeps behavior predictable for a class demo."
+            ]
+          },
+          {
+            "title": "Roadmap",
+            "bullets": [
+              "Broaden coverage beyond a single major slice of the catalog.",
+              "Deepen chat skills (clarifying questions, plan edits).",
+              "Enrich GE coverage and optional signals such as grade distributions from BruinWalk-style data."
+            ]
+          },
+          {
+            "title": "Sample outputs",
+            "bullets": [],
+            "examples": [
+              {
+                "title": "Interest: coding and machine learning",
+                "text": "User: I like coding and machine learning.\n\nAssistant (sketch):\n1) Parse interests: programming + ML.\n2) Retrieve closest catalog chunks (CS intro, ML, stats).\n3) Respect major filters if the user provided them.\n4) Rank by embedding similarity and trim to top matches.\n\nTop matches:\n\u2022 CS M51A: Introduction to Machine Learning (match 94%)\n\u2022 CS 32: Introduction to Data Structures (match 89%)\n\u2022 STATS 100A: Introduction to Probability (match 84%)\n\nConsider pairing ML with linear algebra if you have not completed that sequence yet."
+              },
+              {
+                "title": "Interest: economics",
+                "text": "User: I'm interested in economics!\n\nAssistant:\n\u2022 ECON 1: Principles of Microeconomics (match 91%)\n\u2022 ECON 2: Principles of Macroeconomics (match 88%)\n\u2022 MGMT 1A: Principles of Accounting (match 76%)\n\nThese sit on a typical economics-heavy path. Ask for GE ideas if you want breadth outside the department."
+              },
+              {
+                "title": "Follow-up in the same chat",
+                "text": "User: What about a GE that still feels quantitative?\n\nAssistant:\nI will search the retrieved GE-friendly entries that emphasize numbers or formal reasoning.\n\n\u2022 STATS 12: Statistics for Life Sciences (quantitative GE)\n\u2022 PHILOS 31: Logic, First Course (formal reasoning)\n\nChoose based on whether you prefer data-style work or logic puzzles."
+              }
+            ]
           }
         ]
       }

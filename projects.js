@@ -91,6 +91,25 @@ function renderSectionFigures(s) {
     .join("")}</div>`;
 }
 
+/** Plain-text sample outputs (no images), e.g. chat or reasoning snippets */
+function renderTextExamples(examples) {
+  if (!Array.isArray(examples) || !examples.length) return "";
+  return examples
+    .map((ex) => {
+      if (!ex || typeof ex !== "object") return "";
+      const title = ex.title
+        ? `<p class="project-example-title">${esc(ex.title)}</p>`
+        : "";
+      const body =
+        ex.text != null && String(ex.text).trim()
+          ? `<pre class="project-text-output">${esc(String(ex.text).trim())}</pre>`
+          : "";
+      if (!title && !body) return "";
+      return `<div class="project-text-example">${title}${body}</div>`;
+    })
+    .join("");
+}
+
 function renderSections(sections) {
   if (!Array.isArray(sections) || !sections.length) return "";
   return sections
@@ -106,11 +125,12 @@ function renderSections(sections) {
         .join("");
       const eqs = (s.equations || []).map(renderEquation).join("");
       const figs = renderSectionFigures(s);
+      const examplesHtml = renderTextExamples(s.examples);
       const hasFigs = Boolean(figs);
       const leadBullets = s.bulletsFirst !== false;
       const body = leadBullets
-        ? `${bulletsHtml}${paras}${eqs}`
-        : `${paras}${eqs}${bulletsHtml}`;
+        ? `${bulletsHtml}${paras}${eqs}${examplesHtml}`
+        : `${paras}${eqs}${bulletsHtml}${examplesHtml}`;
       const sectionKind =
         (s.title || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
       const sizeCls = s.figureSize === "large" ? " figure-large" : "";

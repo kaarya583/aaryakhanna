@@ -959,6 +959,38 @@ section:not(:last-of-type) {
   font-size: 0.98rem;
 }
 
+.project-text-example {
+  margin-top: 1rem;
+}
+
+.project-text-example:first-of-type {
+  margin-top: 0.65rem;
+}
+
+.project-example-title {
+  margin: 0 0 0.4rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent-2);
+  font-family: var(--font-mono);
+}
+
+.project-text-output {
+  margin: 0;
+  padding: 0.9rem 1rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--text);
+  background: rgba(12, 18, 24, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  overflow-x: auto;
+}
+
 .project-framework-list {
   margin: 0;
   padding-left: 1.2rem;

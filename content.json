@@ -524,47 +524,18 @@
       },
       "detail": {
         "intro": [
-          "Clean Your Dishes is a batch tool for kitchen videos around the sink.",
-          "The question it answers is simple: what looks like a dish, and is it mostly in the basin or not?",
-          "You step through footage in a viewer with overlays and lists, not a pile of anonymous outputs.",
-          "It skips clean versus dirty scoring. Detection, masks, and one geometric rule keep the story easy to read and to tune."
+          "Dirty dishes getting left out is usually a roommate coordination problem, but it is hard to settle when everyone has a different memory of what happened.",
+          "Clean Your Dishes turns sink-area video into a clear visual record so you can see what was left, where it was, and when it appeared."
         ],
         "sections": [
           {
-            "title": "From clips to labels",
+            "title": "From sink footage to accountability",
             "bullets": [
-              "Load MP4s and define the sink once, from a saved polygon or a default rectangle.",
-              "Write a short text list of dish words (cups, bowls, plates). The model uses that list to propose boxes.",
-              "Each box gets a proper outline mask, not just a rectangle.",
-              "Compare each mask to the sink. The score is how much of the dish lies inside the basin.",
-              "Pass a cutoff and you get two buckets: in sink and outside.",
-              "OpenCV shows the crop, colored masks, the sink outline, and side lists that update as you play the video."
-            ]
-          },
-          {
-            "title": "Why it is built this way",
-            "bullets": [
-              "The overlap rule asks what fraction of the dish sits in the sink. That matches \"mostly in\" for odd shapes without a black box metric.",
-              "Heavy steps run only every few frames. The UI reuses the last result in between so playback stays smooth on a laptop.",
-              "Work happens on a crop around the sink with padding, so the models spend effort where it matters.",
-              "Duplicate boxes get merged before masks. Bounds stay clipped so nothing drifts off the image."
-            ]
-          },
-          {
-            "title": "What you can configure",
-            "bullets": [
-              "Paths to videos, model weights, and optional JSON for the sink shape.",
-              "Prompt text, confidence thresholds, and how aggressively to merge overlapping boxes.",
-              "CPU or GPU. Models load once per run.",
-              "Pick files by name, filter by date from filenames or file times, or browse the folder interactively.",
-              "Calibration mode saves a new sink outline and exits when you are done."
-            ]
-          },
-          {
-            "title": "Compatibility",
-            "bullets": [
-              "GroundingDINO still expects an older Transformers API for BERT. A small startup patch bridges that gap.",
-              "The patch only fixes library versions. It does not change how dishes or the sink are defined."
+              "Load kitchen MP4s and define the sink once with a polygon, so every frame uses the same reference for what counts as in the basin.",
+              "Use a short text prompt (cups, bowls, plates, and similar) to find dish-like objects in each frame.",
+              "Refine each detected box into an object mask, then measure what fraction of that object lies inside the sink region.",
+              "Apply one threshold to split objects into two groups: in sink and outside.",
+              "Render the result in an OpenCV viewer with masks, boxes, the sink outline, and side lists, so anyone can quickly review likely dishes left out and connect them back to specific clips."
             ]
           }
         ]

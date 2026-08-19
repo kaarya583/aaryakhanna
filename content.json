@@ -10,6 +10,17 @@
   "experience": [
     {
       "role": "Data Science Intern",
+      "organization": "LPL Financial",
+      "highlights": [
+        "Productionized a live firm-wide asset attrition forecast, attaining 0.53% walk-forward MAE across a $2T portfolio.",
+        "Designed a client-level KNN decaying regression framework, improving test accuracy by 68% over prior forecasts.",
+        "Automated an end-to-end forecasting workflow supporting executive deliverables and further business planning."
+      ],
+      "software": "Python (scikit-learn, SciPy, Matplotlib), SQL, Microsoft Office (Excel, Word, PowerPoint), GitHub, Tableau",
+      "methods": "Time-series forecasting, KNN regression, exponential regression, walk-forward validation, regularization"
+    },
+    {
+      "role": "Data Science Intern",
       "organization": "AFB International",
       "highlights": [
         "Built classification algorithms and data pipelines to predict and optimize flavor performance using ingredient ratios and trial metadata.",

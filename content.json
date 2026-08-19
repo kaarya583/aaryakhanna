@@ -53,7 +53,8 @@
       "bullets": [
         "LA County screening: job accessibility, desert mapping, rail corridor ranking.",
         "Census + LEHD + GTFS; Laplacian pseudoinverse and effective resistance.",
-        "Heuristic score not a ridership or engineering model."
+        "Compare latent city geometry across physical characteristics.",
+        "See which axes a city is really defined by."
       ],
       "tech": [
         "Geospatial",
